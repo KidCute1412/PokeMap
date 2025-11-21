@@ -6,12 +6,9 @@ function MainLayout(){
     return (
         <div>
             <Navbar></Navbar>
-            <main>
+            <main className = "mt-16">
                 <Outlet/>
             </main>
-            <footer>
-                <p>Main Layout Footer</p>
-            </footer>
         </div>
     )
 }

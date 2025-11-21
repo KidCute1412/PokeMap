@@ -1,9 +1,9 @@
-import {useState, useEffect} from "react";
+
 import PostCard from "@/components/common/PostCard.jsx";
 import ShortCutToMap from "@/components/common/ShortcutToMap.jsx";
+import DragonModel from "@/components/3DModel.jsx";
 
-
-function Posts(){
+export function Posts(){
     const samplePosts = [
         {
             id: 1,
@@ -70,7 +70,7 @@ export default function HomePage(){
             <div className = "w-[55%] ml-[100px]">
                 <Posts></Posts>
             </div>
-            
+            <DragonModel></DragonModel>
             <ShortCutToMap></ShortCutToMap>
         </div>
     );

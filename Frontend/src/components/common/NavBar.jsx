@@ -56,7 +56,7 @@ function Profile(){
     const profileImage = "https://i.pinimg.com/736x/e1/1d/96/e11d969662134a1cf1550a6a64401b0a.jpg"; // Placeholder profile image
     const navigate = useNavigate();
     return (
-        <div className="flex items-center">
+        <div className="flex items-center" onClick = {() => navigate("/profile")}>
             {isSignedIn ? (
                 <>
                     <BellNotification>

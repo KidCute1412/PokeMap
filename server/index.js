@@ -7,6 +7,7 @@ import { Server } from 'socket.io';
 
 import connectDatabase from './config/database.config.js';
 import { initSocket } from './services/socket.service.js';
+import clientRouter from './routes/client/index.route.js';
 
 const app = express();
 const PORT = 10000;
@@ -19,16 +20,16 @@ connectDatabase();
 
 app.use(cors({
     origin: [
-        'http://localhost:3000'
+        'http://localhost:5173'
     ],
     methods: ["GET", "POST", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true
 }));
 
-app.get('/', (req, res) => {
-  res.send('Hello World!');
-});
+app.use(express.json());
+
+app.use("/api", clientRouter);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

@@ -13,5 +13,7 @@
 
 body{
     background-color: black;
+    background-image: linear-gradient(to bottom, #000000, #282b65);
     padding-bottom: 100px;
+    min-height: 100vh;
 }
