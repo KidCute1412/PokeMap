@@ -286,10 +286,11 @@ export const login = async (req, res) => {
 export const forgotPassword = async (req, res) => {
     try{
         const {email} = req.body;
-
+        console.log('Forgot password request for email:', email);
         const user = await User.findOne({
             email: email
         })
+    
         if (!user){
             return res.status(400).json({
                 success: false,

@@ -149,9 +149,40 @@ function LoginForm({ onForgotPassword,  setSharedData }) {
 // Forgot Password Form Component
 function ForgotPasswordForm({ onBackToLogin, onNext, sharedData, setSharedData }) {
     const [email, setEmail] = useState(sharedData.email || '');
-    console.log("Email",email);
     const [isLoading, setIsLoading] = useState(false);
+    
     useEffect(() => {
+        const handleSubmit = () => {
+            if (isLoading) return; // Prevent multiple submissions
+            setIsLoading(true);
+            console.log("Submitting email for OTP:", email);
+            fetch("http://localhost:10000/api/auth/forgot-password", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    toast.error(response.message || "Failed to send reset code!");
+                    return;
+                }
+                return response.json();
+            })
+            .then(data => {
+                if(!data) return;
+                console.log('OTP sent:', data);
+                setSharedData(p => ({...p, email: email}));
+                onNext();
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                toast.error("Can't connect to server!");
+            })
+            .finally(()=>{
+                setIsLoading(false);
+            })
+        };
+
         const validator = new justValidate("#forgot-password-form");
         validator.addField("#forgot-email", [
             { rule: 'required' },
@@ -162,39 +193,13 @@ function ForgotPasswordForm({ onBackToLogin, onNext, sharedData, setSharedData }
         ]);
         validator.onSuccess((e) => {
             e.preventDefault();
-            handleSubmit(e);
+            handleSubmit();
         });
-    }, []);
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (isLoading) return; // Prevent multiple submissions
-        setIsLoading(true);
-        fetch("http://localhost:10000/api/auth/forgot-password", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email })
-        })
-        .then(response => {
-            if (!response.ok) {
-                toast.error(response.message || "Failed to send reset code!");
-                return;
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('OTP sent:', data);
-            toast.success('OTP sent to your email!');
-            setSharedData (p => ({...p, email: email}));
-            onNext();
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-            toast.error("Can't connect to server!");
-        })
-        .finally(()=>{
-            setIsLoading(false);
-        })
-    };
+        
+        return () => {
+            validator.destroy();
+        };
+    }, [email, isLoading, onNext, setSharedData]); // Include all dependencies
 
     return (
         <>
@@ -267,6 +272,7 @@ function OTPForm({ onBackToForgot, onNext, sharedData }) {
             return response.json();
         })
         .then(data => {
+            if(!data) return;
             console.log('OTP verified:', data);
             toast.success('OTP verified successfully!');
             onNext();
@@ -476,16 +482,11 @@ export default function LoginPage(){
         email: '',
     });
 
-    useEffect(() => {
-        console.log ("Current form:", currentForm);
-    })
     // Navigation functions
     const goToLogin = () => setCurrentForm('login');
     const goToForgot = () => setCurrentForm('forgot');
     const goToOTP = () => setCurrentForm('otp');
     const goToReset = () => setCurrentForm('reset');
-
-    // Render current form
     const renderCurrentForm = () => {
         switch(currentForm) {
             case 'login':
@@ -523,13 +524,17 @@ export default function LoginPage(){
                 );
             default:
                 return null;
-        }
+            }
     };
+    // Render current form
+
 
     return (
         <div className="min-h-screen flex items-center justify-center px-4">
             <div className="rounded-2xl p-8 w-full max-w-md bg-black/50 mx-auto mt-[100px] shadow-xl border border-gray-700">
-                {renderCurrentForm()}
+                {
+                    renderCurrentForm()
+                }
             </div>
         </div>
     );
