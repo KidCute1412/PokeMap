@@ -89,7 +89,6 @@ function RegisterForm({ next, setSharedData }) {
             })
             .catch((error) => {
                 console.error('Error:', error);
-                toast.error("Can't connect to server!");
             })
             .finally(() => {
                 setIsLoading(false);
@@ -227,9 +226,28 @@ function OTPForm({ back, sharedData }) {
         })
         .catch((error) => {
             console.error('Error:', error);
-            toast.error("Can't connect to server to verify OTP!");
         });
     };
+
+
+    const handleResendOTP = () => {
+        fetch("http://localhost:10000/api/auth/resend-otp-singup", {
+            method: "POST",
+            headers: { "Content-Type" : "application/json"},
+            body: JSON.stringify({email: sharedData.email})
+        })
+        .then (response => {
+            if (!response.ok){
+                toast.error(response.message || "Failed to resend OTP!");
+                throw new Error ('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then ( data => {
+            console.log ('Success:', data);
+            toast.success ("OTP resent successfully!");
+        })
+    }
 
     return (
         <>
@@ -267,10 +285,7 @@ function OTPForm({ back, sharedData }) {
 
             <div className="text-center mt-6">
                 <button 
-                    onClick={() => {
-                        // Resend OTP logic
-                        toast.info('OTP resent!');
-                    }}
+                    onClick = {handleResendOTP}
                     className="text-blue-400 hover:text-blue-300 text-sm transition-colors bg-transparent border-none cursor-pointer"
                 >
                     Resend OTP

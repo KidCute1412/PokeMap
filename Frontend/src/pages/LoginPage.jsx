@@ -68,7 +68,6 @@ function LoginForm({ onForgotPassword,  setSharedData }) {
             })
             .catch((error) => {
                 console.error('Error:', error);
-                toast.error("Can't connect to server!");
             })
             .finally(()=> {
                 setIsLoading(false);
