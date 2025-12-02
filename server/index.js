@@ -8,6 +8,7 @@ import { Server } from 'socket.io';
 import connectDatabase from './config/database.config.js';
 import { initSocket } from './services/socket.service.js';
 import clientRouter from './routes/client/index.route.js';
+import adminRouter from './routes/admin/index.route.js';
 
 const app = express();
 const PORT = 10000;
@@ -29,8 +30,9 @@ app.use(cors({
 
 app.use(express.json());
 
-app.use("/api", clientRouter);
+app.use("/", clientRouter);
+app.use("/api/admin", adminRouter);
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

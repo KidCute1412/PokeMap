@@ -1,5 +1,3 @@
-
-
 import jwt from 'jsonwebtoken';
 import {
     signupService,
@@ -11,8 +9,8 @@ import {
     resetPasswordService
 } from '../../services/auth.service.js';
 
-// SIGNUP - Step 1
-export const signup = async (req, res) => {
+// SIGNUP ADMIN - Step 1
+export const signupAdmin = async (req, res) => {
     try {
         const { email, password, username } = req.body;
         
@@ -24,7 +22,7 @@ export const signup = async (req, res) => {
             });
         }
 
-        const result = await signupService(email, password, username, 'user');
+        const result = await signupService(email, password, username, 'admin');
         
         res.status(200).json({
             success: result.success,
@@ -33,20 +31,20 @@ export const signup = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Signup error:', error.message);
-        res.status(500).json({
+        console.error('Admin signup error:', error.message);
+        res.status(400).json({
             success: false,
-            message: error.message || 'Server error during signup'
+            message: error.message || 'Server error during admin signup'
         });
     }
 };
 
-// VERIFY SIGNUP OTP - Step 2
-export const verifySignupOTP = async (req, res) => {
+// VERIFY ADMIN SIGNUP OTP - Step 2
+export const verifyAdminSignupOTP = async (req, res) => {
     try {
         const { email, otp } = req.body;
 
-        const result = await verifySignupOTPService(email, otp, 'user');
+        const result = await verifySignupOTPService(email, otp, 'admin');
         
         res.status(201).json({
             success: result.success,
@@ -55,20 +53,20 @@ export const verifySignupOTP = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Verify OTP error:', error.message);
+        console.error('Verify admin OTP error:', error.message);
         res.status(400).json({
             success: false,
-            message: error.message || 'Server error during verification'
+            message: error.message || 'Server error during admin verification'
         });
     }
 };
 
-// RESEND SIGNUP OTP
-export const resendSignupOTP = async (req, res) => {
+// RESEND ADMIN SIGNUP OTP
+export const resendAdminSignupOTP = async (req, res) => {
     try {
         const { email } = req.body;
 
-        const result = await resendSignupOTPService(email, 'user');
+        const result = await resendSignupOTPService(email, 'admin');
         
         res.status(200).json({
             success: result.success,
@@ -76,7 +74,7 @@ export const resendSignupOTP = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Resend OTP error:', error.message);
+        console.error('Resend admin OTP error:', error.message);
         res.status(400).json({
             success: false,
             message: error.message || 'Server error during OTP resend'
@@ -84,22 +82,22 @@ export const resendSignupOTP = async (req, res) => {
     }
 };
 
-// LOGIN
-export const login = async (req, res) => {
+// LOGIN ADMIN
+export const loginAdmin = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        const result = await loginService(email, password, 'user');
+        const result = await loginService(email, password, 'admin');
 
         // Create JWT token
         const token = jwt.sign(
-            { id: result.data.user.id, email: result.data.user.email },
+            { id: result.data.user.id, email: result.data.user.email, role: 'admin' },
             process.env.JWT_SECRET,
             { expiresIn: '1d' }
         );
 
         // Set cookie
-        res.cookie("token", token, {
+        res.cookie("adminToken", token, {
             httpOnly: true,
             secure: false,
             sameSite: 'lax',
@@ -113,20 +111,20 @@ export const login = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Login error:', error.message);
+        console.error('Admin login error:', error.message);
         res.status(400).json({
             success: false,
-            message: error.message || 'Server error during login'
+            message: error.message || 'Server error during admin login'
         });
     }
 };
 
-// FORGOT PASSWORD
-export const forgotPassword = async (req, res) => {
+// FORGOT PASSWORD ADMIN
+export const forgotPasswordAdmin = async (req, res) => {
     try {
         const { email } = req.body;
 
-        const result = await forgotPasswordService(email, 'user');
+        const result = await forgotPasswordService(email, 'admin');
         
         res.status(200).json({
             success: result.success,
@@ -134,7 +132,7 @@ export const forgotPassword = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Forgot Password error:', error.message);
+        console.error('Admin forgot password error:', error.message);
         res.status(400).json({
             success: false,
             message: error.message || 'Server error during forgot password'
@@ -142,8 +140,8 @@ export const forgotPassword = async (req, res) => {
     }
 };
 
-// VERIFY FORGOT PASSWORD OTP
-export const verifyForgotPasswordOTP = async (req, res) => {
+// VERIFY ADMIN FORGOT PASSWORD OTP
+export const verifyAdminForgotPasswordOTP = async (req, res) => {
     try {
         const { email, otp } = req.body;
 
@@ -155,7 +153,7 @@ export const verifyForgotPasswordOTP = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Verify Forgot Password OTP error:', error.message);
+        console.error('Verify admin forgot password OTP error:', error.message);
         res.status(400).json({
             success: false,
             message: error.message || 'Server error during OTP verification'
@@ -163,12 +161,12 @@ export const verifyForgotPasswordOTP = async (req, res) => {
     }
 };
 
-// RESET PASSWORD
-export const resetPassword = async (req, res) => {
+// RESET ADMIN PASSWORD
+export const resetAdminPassword = async (req, res) => {
     try {
         const { email, newPassword } = req.body;
 
-        const result = await resetPasswordService(email, newPassword, 'user');
+        const result = await resetPasswordService(email, newPassword, 'admin');
         
         res.status(200).json({
             success: result.success,
@@ -176,7 +174,7 @@ export const resetPassword = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Reset Password error:', error.message);
+        console.error('Admin reset password error:', error.message);
         res.status(400).json({
             success: false,
             message: error.message || 'Server error during password reset'
