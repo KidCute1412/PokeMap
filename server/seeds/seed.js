@@ -28,7 +28,7 @@ const seedDatabase = async () => {
         const users = await User.find().limit(5);
         
         if (users.length < 2) {
-            console.log('❌ Need at least 2 users in database. Please create users first.');
+            console.log('Need at least 2 users in database. Please create users first.');
             process.exit(1);
         }
 
