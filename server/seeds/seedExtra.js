@@ -7,6 +7,7 @@ import MapPin from '../models/mapPin.model.js';
 import { PendingUser } from '../models/pendingUser.model.js';
 import { OTPResetPassword } from '../models/otpResetPassword.model.js';
 import { hashPassword } from '../helpers/auth.helper.js';
+import { User } from '../models/user.model.js';
 
 const seedPinData = async () => {
     try {
@@ -19,11 +20,24 @@ const seedPinData = async () => {
         await PendingUser.deleteMany({});
         await OTPResetPassword.deleteMany({});
 
+        // Get existing users
+        const users = await User.find().limit(3);
+        
+        if (users.length < 1) {
+            console.log('❌ Need at least 1 user in database. Please create users first.');
+            process.exit(1);
+        }
+
+        const user1 = users[0];
+        const user2 = users.length > 1 ? users[1] : users[0];
+        const user3 = users.length > 2 ? users[2] : users[0];
+
         // ===== MapPin Data (Pokemon Locations) =====
         const mapPins = await MapPin.insertMany([
             // Pikachu locations
             {
                 pokemonID: 25,
+                userID: user1._id,
                 latitude: 10.8231,
                 longitude: 106.6830,
                 status: true,
@@ -31,6 +45,7 @@ const seedPinData = async () => {
             },
             {
                 pokemonID: 25,
+                userID: user2._id,
                 latitude: 10.7769,
                 longitude: 106.7009,
                 status: true,
@@ -39,6 +54,7 @@ const seedPinData = async () => {
             // Charmander locations
             {
                 pokemonID: 4,
+                userID: user3._id,
                 latitude: 10.8215,
                 longitude: 106.6912,
                 status: false,
@@ -46,6 +62,7 @@ const seedPinData = async () => {
             },
             {
                 pokemonID: 4,
+                userID: user1._id,
                 latitude: 10.7575,
                 longitude: 106.6761,
                 status: true,
@@ -54,6 +71,7 @@ const seedPinData = async () => {
             // Squirtle locations
             {
                 pokemonID: 7,
+                userID: user2._id,
                 latitude: 10.7282,
                 longitude: 106.7331,
                 status: true,
@@ -61,6 +79,7 @@ const seedPinData = async () => {
             },
             {
                 pokemonID: 7,
+                userID: user3._id,
                 latitude: 10.8036,
                 longitude: 106.6638,
                 status: true,
@@ -69,6 +88,7 @@ const seedPinData = async () => {
             // Bulbasaur locations
             {
                 pokemonID: 1,
+                userID: user1._id,
                 latitude: 10.7538,
                 longitude: 106.7244,
                 status: true,
@@ -76,6 +96,7 @@ const seedPinData = async () => {
             },
             {
                 pokemonID: 1,
+                userID: user2._id,
                 latitude: 10.8050,
                 longitude: 106.6505,
                 status: false,
@@ -84,6 +105,7 @@ const seedPinData = async () => {
             // Dragonite location
             {
                 pokemonID: 149,
+                userID: user3._id,
                 latitude: 10.7965,
                 longitude: 106.7275,
                 status: true,
@@ -92,6 +114,7 @@ const seedPinData = async () => {
             // Mewtwo location (rare)
             {
                 pokemonID: 150,
+                userID: user1._id,
                 latitude: 10.8145,
                 longitude: 106.6527,
                 status: true,

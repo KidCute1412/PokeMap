@@ -5,6 +5,11 @@ const mapPinSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    userID: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Users',
+        required: true
+    },
     latitude: {
         type: Number,
         required: true
