@@ -290,7 +290,7 @@ function OTPForm({ back, sharedData }) {
                 >
                     Resend OTP
                 </button>
-                <div className="mt-4 text-gray-400 text-sm" onClick = {back}>
+                <div className="mt-4 text-gray-400 text-sm cursor-pointer" onClick = {back}>
                     Back to Sign Up 
                 </div>
             </div>
