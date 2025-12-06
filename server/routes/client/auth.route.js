@@ -5,16 +5,10 @@ const router = express.Router();
 
 router.post("/signup", authController.signup);
 router.post("/verify-otp-signup", authController.verifySignupOTP);
+router.post("/resend-otp-signup", authController.resendSignupOTP);
 router.post("/login", authController.login);
 router.post("/forgot-password", authController.forgotPassword);
+router.post("/verify-otp-forgot-password", authController.verifyForgotPasswordOTP);
 router.post("/reset-password", authController.resetPassword);
-router.post("/verify-otp-reset-password", authController.otpForgotPassword);
-router.post("/resend-otp-singup", authController.resendSignupOTP);
-
-// router.post("/login", authController.login);
-
-// router.post("/forgot-password", authController.forgotPassword);
-// router.post("/reset-password", authController.resetPassword);
-// router.post("/logout", authController.logout);
 
 export default router;
