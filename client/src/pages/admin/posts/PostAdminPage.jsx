@@ -5,13 +5,13 @@ import PostDetailModal from "@/pages/admin/posts/components/PostDetailModal";
 import WarnModal from "@/pages/admin/posts/components/WarnModal";
 import DeleteModal from "@/pages/admin/posts/components/DeleteModal";
 import PaginationComponent from '@/components/common/Pagination';
-
+import Loading from '@/components/common/Loading';
 const PostManagementDashboard = () => {
   const [posts, setPosts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [numberOfPages, setNumberOfPages] = useState(1);
   const [searchParams, setSearchParams] = useSearchParams();
-  
+  const [isLoading, setIsLoading] = useState(true);
   
   
 
@@ -22,6 +22,7 @@ const PostManagementDashboard = () => {
 
   // Fetch posts data -> get posts in current page and number of page
   useEffect (() => {
+    setIsLoading(true);
     const page = searchParams.get("page") || 1;
     fetch (`http://localhost:10000/api/admin/post/listPosts?page=${page}`)
     .then (res => res.json())
@@ -33,7 +34,10 @@ const PostManagementDashboard = () => {
     })
     .catch (err => {
       console.error("Error fetching posts:", err);
-    });
+    })
+    .finally(()=> {
+        setIsLoading(false);
+    })
   }, [searchParams]);
 
   
@@ -48,7 +52,7 @@ const PostManagementDashboard = () => {
 
 
   return (
-    <div className="min-h-screen bg-blue-50 p-6">
+     isLoading ? <Loading></Loading> : <div className="min-h-screen bg-blue-50 p-6">
       {/* Header */}
       <div className="flex items-center gap-3 mb-8">
         <div className="bg-pink-400 p-3 rounded-2xl">
@@ -62,7 +66,7 @@ const PostManagementDashboard = () => {
         <div className="bg-white rounded-3xl p-6 flex items-center justify-between shadow-sm">
           <div>
             <p className="text-gray-500 text-sm">Total Posts</p>
-            <p className="text-3xl font-bold text-green-500">{posts.length}</p>
+            <p className="text-sm font-bold text-green-500">{posts.length}</p>
           </div>
           <MessageCircle className="text-pink-300" size={48} />
         </div>

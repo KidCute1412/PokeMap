@@ -5,7 +5,7 @@ import UserDetailModal from '@/pages/admin/users/components/UserDetailModal';
 import DeleteConfirmModal from '@/pages/admin/users/components/UserDeleteModal';
 import { useSearchParams } from 'react-router-dom';
 import {toast} from "sonner";
-
+import Loading from '@/components/common/Loading';
 // User Detail Modal Component
 
 
@@ -14,6 +14,7 @@ import {toast} from "sonner";
 
 
 export default function App() {
+  const [isLoading, setIsLoading] = useState(true);
   const [users, setUsers] = useState();
   const [selectedUser, setSelectedUser] = useState(null);
   const [userToDelete, setUserToDelete] = useState(null);
@@ -43,6 +44,7 @@ export default function App() {
   // List Users and Total Users
   useEffect (() => {
     // List Users
+    setIsLoading(true);
     const page = searchParams.get("page") || 1;
     fetch(`http://localhost:10000/api/admin/user/listUsers?page=${page}&limit=5`)
     .then (res => res.json())
@@ -69,11 +71,14 @@ export default function App() {
       console.error("Error fetching total users:", err);
       toast.error("Failed to fetch total users");
     });
+
+    setIsLoading(false);
   }, [searchParams]);
 
   // Number of Pages
   useEffect (()=> {
     //  Number of Pages
+    setIsLoading(true);
     fetch("http://localhost:10000/api/admin/user/total-pages?limit=5")
     .then (res => res.json())
     .then (data => {
@@ -86,7 +91,7 @@ export default function App() {
       console.error("Error fetching total user pages:", err);
       toast.error("Failed to fetch total user pages");
     });
-
+    setIsLoading(false);
     setCurrentPage (Number(searchParams.get("page")) || 1);
   }, [searchParams]);
 
@@ -101,7 +106,7 @@ export default function App() {
 
 
   return (
-    <div className="min-h-screen p-4 md:p-8">
+    isLoading ? <Loading></Loading> :<div className="min-h-screen p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
