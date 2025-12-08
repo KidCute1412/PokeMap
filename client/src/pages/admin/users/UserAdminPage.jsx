@@ -109,6 +109,7 @@ export default function App() {
     isLoading ? <Loading></Loading> :<div className="min-h-screen p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
+       
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-12 h-12 bg-rose-400 rounded-lg flex items-center justify-center">
@@ -126,7 +127,7 @@ export default function App() {
             <div className="flex items-center justify-between">
               <div>
                 <p className=" text-gray-600 mb-1">Total Users</p>
-                <p className="text-green-500 font-bold">{totalUsers}</p>
+                <p className="text-green-500 font-bold text-2xl">{totalUsers}</p>
               </div>
               <div className="w-12 h-12 bg-rose-100 rounded-lg flex items-center justify-center">
                 <Users className="w-6 h-6 text-rose-600" />
@@ -192,7 +193,7 @@ export default function App() {
                       <td className="px-6 py-4 text-sm text-gray-600">{user.email}</td>
                       {/* Role */}
                       <td className="px-6 py-4">
-                        <span className="inline-flex px-3 py-1 rounded-full text-xs bg-blue-100 text-blue-800">
+                        <span className="inline-flex px-3 py-1 rounded-full text text-shadow-2xs bg-blue-100 text-blue-800">
                           {user.role}
                         </span>
                       </td>
@@ -202,7 +203,7 @@ export default function App() {
                         : <span className="text-gray-400">N/A</span>}
       
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
+                      <td className="px-6 py-4 text-sm text-shadow-2xs text-gray-600 w-[100px]">
                         {new Date(user.createdAt).toLocaleString('vi-VN', {
                           timeZone: 'Asia/Ho_Chi_Minh',
                           year: 'numeric',
@@ -248,6 +249,8 @@ export default function App() {
           user={userToDelete} 
           onClose={() => setUserToDelete(null)} 
         />
+
+        
         
       </div>
     </div>

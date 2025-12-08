@@ -1,17 +1,17 @@
 // @ts-expect-error
 import notificationIcon from "../../assets/icons/bell.png"
-import {use, useState} from "react";
+import {useState} from "react";
 // @ts-expect-error
 import LogoIcon from "../../assets/icons/logo.png";
 import {useNavigate} from "react-router-dom";
-
-
+import {useAuth} from "@/routes/ProtectedRouter.jsx";
+import speakingURL from "speakingurl"
 
 // Main function for NavBar
 export default function Navbar(){
     return(
         <>
-            <div className="fixed top-0 left-0 w-full h-16 bg-gray-900 flex items-center justify-between px-4 shadow-lg z-50">
+            <div className="fixed top-0 left-0 w-full h-16 bg-gray-900/80 flex items-center justify-between px-4 shadow-lg z-50">
                 <Logo />
                 <SearchBar />
                 <div className="flex items-center space-x-4">
@@ -26,7 +26,7 @@ export default function Navbar(){
 function Logo(){
 
     const logoImage = LogoIcon; // Placeholder logo image
-    const navigate = useNavigate();
+    const navigate = useNavigate(); 
     return (
         <div className="flex items-center space-x-2 cursor-pointer" onClick = {() => navigate("/")}>
             <img src={logoImage} alt="Logo" className="w-[150px] h-[70px] object-cover"/>
@@ -55,24 +55,26 @@ function SearchBar(){
 
 
 function Profile(){
-    const isSignedIn = true; // Assume signed in for now
+    const {user} = useAuth();
+    console.log("NavBar User:", user);
     const profileImage = "https://i.pinimg.com/736x/e1/1d/96/e11d969662134a1cf1550a6a64401b0a.jpg"; // Placeholder profile image
     const navigate = useNavigate();
     return (
         <div className="flex items-center">
-            {isSignedIn ? (
+            {user ? (
                 <>
                     <BellNotification>
                         <MenuInsideBell />
                     </BellNotification>
-                    <img src={profileImage}  onClick = {() => navigate("/profile")} alt="Profile" className="w-10 h-10 ml-2  rounded-full cursor-pointer hover:ring-2 hover:ring-blue-500" />
+                    <div className = "text-gray-300 text-sm ml-2">{user.username}</div>
+                    <img src={user.profile.avatar || profileImage}  onClick = {() => navigate(`/profile/${speakingURL(user.username)}_${user._id}`)} alt="Profile" className="w-10 h-10 ml-2  rounded-full cursor-pointer hover:ring-2 hover:ring-blue-500" />
                     
                 </>
                 
             ) : (
-                <button className="font-bold text-white px-4 py-2 rounded-lg hover:text-gray-400 hover:cursor-pointer transition-colors">
+                <a href = "/account/login" className="font-bold text-white px-4 py-2 rounded-lg hover:text-gray-400 hover:cursor-pointer transition-colors">
                     Sign In
-                </button>
+                </a>
             )}
         </div>
     );

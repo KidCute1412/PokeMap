@@ -10,6 +10,8 @@ import {
     resetPasswordService
 } from '../../services/auth.service.js';
 
+import { User } from '../../models/auth.model.js';
+
 // SIGNUP - Step 1
 export const signup = async (req, res) => {
     try {
@@ -97,9 +99,10 @@ export const login = async (req, res) => {
             { expiresIn: '1d' }
         );
 
+
         // Set cookie
-        res.cookie("token", token, {
-            httpOnly: true,
+        res.cookie("accessToken", token, {
+            httpOnly: false,
             secure: false,
             sameSite: 'lax',
             maxAge: 24 * 60 * 60 * 1000
@@ -179,6 +182,32 @@ export const resetPassword = async (req, res) => {
         res.status(400).json({
             success: false,
             message: error.message || 'Server error during password reset'
+        });
+    }
+};
+
+// GET ME
+export const getMe = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const result = await User.findById(userId);
+
+        if (!result) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+        res.status(200).json({
+            success: true,
+            message: 'User retrieved successfully',
+            user: result
+        });
+    } catch (error) {
+        console.error('Get Me error:', error.message);
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Server error during fetching user data'
         });
     }
 };

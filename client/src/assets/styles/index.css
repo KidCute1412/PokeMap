@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+
 @custom-variant dark (&:is(.dark *));
 
 /* Hide scrollbar cross-browser */
@@ -14,12 +15,15 @@
 
 body{
     background-color: black;
-    background-image: linear-gradient(to bottom, #000000, #282b65);
+    background-image: linear-gradient(to bottom, #000000, rgb(12, 12, 14),rgb(13, 13, 27), rgb(41, 41, 90), #474db9);
+    background-attachment: fixed;
+    background-size: cover;
+    background-repeat: no-repeat;
     padding-bottom: 100px;
     min-height: 100vh;
-}
-
-@theme inline {
+    font-size: 18px;
+    /* font-family: 'Montserrat', sans-serif; */
+}@theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);

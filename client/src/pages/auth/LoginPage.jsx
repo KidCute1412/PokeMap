@@ -52,6 +52,7 @@ function LoginForm({ onForgotPassword,  setSharedData }) {
             fetch("http://localhost:10000/api/auth/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
+                credentials: "include",
                 body: JSON.stringify(formData)
             })
             .then(response => {

@@ -8,10 +8,13 @@ import RegisterPage from "@/pages/auth/RegisterPage";
 import DashBoardPage from "@/pages/admin/DashboardPage.jsx";
 import UserAdminPage from "@/pages/admin/users/UserAdminPage.jsx";
 import PostAdminPage from "@/pages/admin/posts/PostAdminPage.jsx";
+import ProtectedRouter from "@/routes/ProtectedRouter.jsx";
 const routers = createBrowserRouter([
     {
         path : "/",
-        element: <MainLayout></MainLayout>,
+        element: <ProtectedRouter>
+                    <MainLayout></MainLayout>
+                 </ProtectedRouter>,
         children : [
             {
                 path: "",
@@ -19,7 +22,7 @@ const routers = createBrowserRouter([
                 
             },
             {
-                path: "profile",
+                path: "profile/:username_id",
                 element: <ProfilePage></ProfilePage>
             }
         ]

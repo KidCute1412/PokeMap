@@ -4,11 +4,11 @@ dotenv.config();
 import cors from 'cors';
 import http from 'http';
 import { Server } from 'socket.io';
+import coookieParser from 'cookie-parser';
 
 import connectDatabase from './config/database.config.js';
 import { initSocket } from './services/socket.service.js';
 import clientRouter from './routes/client/index.route.js';
-import adminRouter from './routes/admin/index.route.js';
 
 const app = express();
 const PORT = 10000;
@@ -19,6 +19,7 @@ initSocket(io);
 
 connectDatabase();
 
+
 app.use(cors({
     origin: [
         'http://localhost:3800'
@@ -27,12 +28,12 @@ app.use(cors({
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true
 }));
+app.use(coookieParser());
 
 app.use(express.json());
 
 app.use("/api", clientRouter);
-app.use("/api/admin", adminRouter);
 
-server.listen(PORT, () => {
+app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

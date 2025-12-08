@@ -1,5 +1,5 @@
 
-import PostCard from "@/components/common/PostCard.jsx";
+import PostCard from "@/pages/client/components/posts/PostCard.jsx";
 import ShortCutToMap from "@/components/common/ShortcutToMap.jsx";
 import DragonModel from "@/components/3DModel.jsx";
 
@@ -15,7 +15,12 @@ export function Posts(){
             content: "Nội dung bài viết",
             likes: 1001,
             comments: 1001,
-            isFollowing: false
+            isFollowing: false,
+            images: [
+                "https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=500",
+                "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500",
+                "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500"
+            ]
         },
         {
             id: 2,
@@ -27,7 +32,10 @@ export function Posts(){
             content: "Just caught a rare Pikachu in the wild! The weather was perfect for Pokemon hunting today. #PokemonGO #Pikachu",
             likes: 542,
             comments: 89,
-            isFollowing: true
+            isFollowing: true,
+            images: [
+                "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500"
+            ]
         },
         {
             id: 3,
@@ -39,12 +47,13 @@ export function Posts(){
             content: "Beautiful sunset at the Pokemon Center today. Met some amazing trainers and their Pokemon companions!",
             likes: 823,
             comments: 156,
-            isFollowing: false
+            isFollowing: false,
+            images: []
         }
     ];
 
     return(
-        <div className="max-w-2xl mx-auto px-2 py-2 bg-sky-800 rounded-2xl">
+        <div className="max-w-full px-2 py-2 rounded-2xl">
             {samplePosts.map(post => (
                 <PostCard 
                     key={post.id}
@@ -54,6 +63,7 @@ export function Posts(){
                     likes={post.likes}
                     comments={post.comments}
                     isFollowing={post.isFollowing}
+                    images={post.images}    
                 />
             ))}
         </div>
@@ -67,7 +77,7 @@ export default function HomePage(){
 
     return(
         <div className="min-h-screen pt-20 px-4">
-            <div className = "w-[55%] ml-[100px]">
+            <div className = "w-[60%] ml-[100px] items-start">
                 <Posts></Posts>
             </div>
             <DragonModel></DragonModel>

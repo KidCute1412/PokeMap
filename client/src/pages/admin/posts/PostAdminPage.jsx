@@ -55,10 +55,10 @@ const PostManagementDashboard = () => {
      isLoading ? <Loading></Loading> : <div className="min-h-screen bg-blue-50 p-6">
       {/* Header */}
       <div className="flex items-center gap-3 mb-8">
-        <div className="bg-pink-400 p-3 rounded-2xl">
+        <div className="bg-rose-400 p-3 rounded-2xl">
           <MessageCircle className="text-white" size={28} />
         </div>
-        <h1 className="text-3xl font-bold text-gray-800">Post Management Dashboard</h1>
+        <h1 className="text-3xl font-bold text-gray-500">Post Management Dashboard</h1>
       </div>
 
       {/* Stats */}
@@ -66,9 +66,11 @@ const PostManagementDashboard = () => {
         <div className="bg-white rounded-3xl p-6 flex items-center justify-between shadow-sm">
           <div>
             <p className="text-gray-500 text-sm">Total Posts</p>
-            <p className="text-sm font-bold text-green-500">{posts.length}</p>
+            <p className="text-2xl font-bold text-green-500">{posts.length}</p>
           </div>
-          <MessageCircle className="text-pink-300" size={48} />
+          <div className="bg-rose-400 p-3 rounded-2xl">
+          <MessageCircle className="text-white" size={28} />
+        </div>
         </div>
       </div>
 

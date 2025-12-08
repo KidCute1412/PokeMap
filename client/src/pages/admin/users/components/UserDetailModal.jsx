@@ -17,7 +17,7 @@ export default function UserDetailModal ({ user, onClose }) {
     };
   })
   return (
-    <div className="fixed inset-0 bg-white/50 bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 bg-white/50 bg-opacity-50 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
       <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         {/* Modal Header - Hero Style with Avatar Background */}
         <div className="relative h-48 bg-gradient-to-br from-blue-500 via-purple-600 to-pink-500 rounded-t-2xl overflow-hidden">
