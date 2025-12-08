@@ -21,6 +21,10 @@ const userSchema = new mongoose.Schema({
         enum: ['male', 'female', 'other'], 
         default: 'other' 
     },
+    description: {
+        type: String,
+        default: ''
+    },
     profile: {
         avatar: String
     },

@@ -12,7 +12,9 @@ const AuthContext = createContext();
 
 export default function ProtectedRouter({children}) {
     const [user, setUser] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
     useEffect (() => {
+        setIsLoading (true);
         fetch("http://localhost:10000/api/auth/me", {
             credentials: "include"
         })
@@ -33,12 +35,15 @@ export default function ProtectedRouter({children}) {
         .catch (err => {
             console.error("Error fetching user data:", err);    
             setUser(null);
-        });
+        })
+        .finally(()=> {
+            setIsLoading(false);
+        })
     }, [])
 
     return (
         <AuthContext.Provider value={{user, setUser}}>
-            {children}
+            {!isLoading && children}
         </AuthContext.Provider>
     )
 }

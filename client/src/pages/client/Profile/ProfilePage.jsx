@@ -1,8 +1,9 @@
 import PostCard from "@/pages/client/components/posts/PostCard";
 import ShortcutToMap from "@/components/common/ShortcutToMap";
 import {useState, useEffect} from "react";
-import {useParams} from "react-router-dom";
+import {useParams, useNavigate} from "react-router-dom";
 import Loading from "@/components/common/Loading";
+
 // username, email, sex, followers, following, avatar
 function ProfileHeader(){
     const [userProfile, setUserProfile] = useState();
@@ -10,6 +11,8 @@ function ProfileHeader(){
     const username = username_id.split("_")[0];
     const userId = username_id.split("_")[1];
     const [isLoading, setIsLoading] = useState(true);
+    const [showFullDescription, setShowFullDescription] = useState(false);
+    const navigate = useNavigate();
     // Fetch user profile data
     useEffect (() => {
         setIsLoading(true);
@@ -81,9 +84,31 @@ function ProfileHeader(){
                     </div>
                 </div>
             </div>
-            
+
+            {/* Description Section */}
+            <div className="mb-6">
+                <div className="bg-gray-700/50 rounded-xl p-4 border border-gray-600">
+                    <div
+                        className={`text-gray-300 text-base leading-relaxed prose prose-invert max-w-none ${
+                            !showFullDescription ? 'line-clamp-3' : ''
+                        }`}
+                        dangerouslySetInnerHTML={{__html: userProfile.description}}
+                    ></div>
+
+                    {/* Toggle Button */}
+                    {userProfile.description && (
+                        <button
+                            onClick={() => setShowFullDescription(!showFullDescription)}
+                            className="mt-3 text-gray-500 hover:text-gray-300 cursor-pointer text-sm font-medium transition-colors"
+                        >
+                            {showFullDescription ? 'Shorten' : 'More'}
+                        </button>
+                    )}
+                </div>
+            </div>
+
             {/* Edit Profile Button */}
-            <button className="w-full bg-purple-600 hover:bg-purple-700 text-white text-xl font-semibold py-4 rounded-2xl transition-colors cursor-pointer">
+            <button onClick = {() => {navigate(`/profile/edit`)}} className="w-full bg-purple-600 hover:bg-purple-700 text-white text-xl font-semibold py-4 rounded-2xl transition-colors cursor-pointer">
                 Edit Profile
             </button>
         </div>
@@ -141,7 +166,7 @@ function Posts(){
     ];
 
     return(
-        <div className="max-w-2xl px-2 py-2 bg-sky-800 rounded-2xl">
+        <div className="max-w-2xl px-2 py-2 rounded-2xl">
             {samplePosts.map(post => (
                 <PostCard 
                     key={post.id}

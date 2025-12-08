@@ -133,3 +133,15 @@ export async function findUserProfile (id, username) {
   console.log("User Profile found:", userProfile[0]);
   return userProfile[0]; // Return first result since aggregate returns array
 }
+
+
+export async function updateUserProfile (userId, updateData) {
+  console.log("Updating user profile for ID:", userId, "with data:", updateData);
+  const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { $set: updateData },
+      { new: true }
+  ).select('-password');
+  console.log("Updated user profile:", updatedUser);
+  return updatedUser;
+}

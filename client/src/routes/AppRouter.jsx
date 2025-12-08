@@ -2,13 +2,14 @@ import {createBrowserRouter} from "react-router-dom";
 import MainLayout from "@/layouts/MainLayout.jsx";
 import AdminLayout from "@/layouts/AdminLayout.jsx";
 import HomePage from "@/pages/client/HomePage.jsx";
-import ProfilePage from "@/pages/client/ProfilePage.jsx";
+import ProfilePage from "@/pages/client/Profile/ProfilePage.jsx";
 import LoginPage from "@/pages/auth/LoginPage.jsx";
 import RegisterPage from "@/pages/auth/RegisterPage";
 import DashBoardPage from "@/pages/admin/DashboardPage.jsx";
 import UserAdminPage from "@/pages/admin/users/UserAdminPage.jsx";
 import PostAdminPage from "@/pages/admin/posts/PostAdminPage.jsx";
 import ProtectedRouter from "@/routes/ProtectedRouter.jsx";
+import EditProfile from "@/pages/client/Profile/components/EditProfile";
 const routers = createBrowserRouter([
     {
         path : "/",
@@ -24,6 +25,10 @@ const routers = createBrowserRouter([
             {
                 path: "profile/:username_id",
                 element: <ProfilePage></ProfilePage>
+            },
+            {
+                path: "profile/edit/",
+                element: <EditProfile></EditProfile>
             }
         ]
     },
