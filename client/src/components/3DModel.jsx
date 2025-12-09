@@ -24,7 +24,7 @@ export default function DragonModel (){
 
     return (
         <>
-        <div className = "flex justify-center items-center fixed right-6 -bottom-14 w-[35%] h-[50%] z-10 pointer-events-none">
+        <div className = "flex justify-center items-center fixed -right-7 -bottom-14 w-[35%] h-[50%] z-10 pointer-events-none">
             <Canvas 
                 camera={{ position: [-10, -30, -50], fov: 50 }}
                 style={{ pointerEvents: 'auto' , background: 'transparent'}}
