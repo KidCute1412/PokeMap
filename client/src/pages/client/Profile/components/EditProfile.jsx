@@ -5,7 +5,7 @@ import {useAuth} from "@/routes/ProtectedRouter.jsx";
 import TextEditor from "@/components/common/TextEditor.jsx";    
 import JustValidate from "just-validate";
 import {toast} from "sonner";
-
+import speakingURL from "speakingurl"
 export default function EditProfile() {
     const {user, setUser} = useAuth();
 
@@ -92,7 +92,7 @@ export default function EditProfile() {
         .then (data => {
                 toast.success("Cập nhật hồ sơ thành công");
                 setUser(data.data);
-                navigate(`/profile/${data.data.username}_${data.data._id}`);
+                navigate(`/profile/${speakingURL(data.data.username)}_${data.data._id}`);
         })
         .catch (err => {
             console.error("Error updating profile:", err);
@@ -216,7 +216,7 @@ export default function EditProfile() {
                     <div className="flex space-x-4">
                         <button
                             type="button"
-                            onClick={() => navigate(`/profile/${user.username}_${user.id}`)}
+                            onClick={() => navigate(`/profile/${speakingURL(user.username)}_${user.id}`)}
                             className="flex-1 px-6 py-4 cursor-pointer bg-gray-700 hover:bg-gray-600 text-white rounded-xl transition-colors font-medium text-lg"
                         >
                             Hủy

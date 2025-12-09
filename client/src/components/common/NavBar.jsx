@@ -57,7 +57,7 @@ function SearchBar(){
 function Profile(){
     const {user} = useAuth();
     console.log("NavBar User:", user);
-    const profileImage = "https://i.pinimg.com/736x/e1/1d/96/e11d969662134a1cf1550a6a64401b0a.jpg"; // Placeholder profile image
+
     const navigate = useNavigate();
     return (
         <div className="flex items-center">
@@ -67,7 +67,15 @@ function Profile(){
                         <MenuInsideBell />
                     </BellNotification>
                     <div className = "text-gray-300 text-sm ml-2">{user.username}</div>
-                    <img src={user.profile.avatar || profileImage}  onClick = {() => navigate(`/profile/${speakingURL(user.username)}_${user._id}`)} alt="Profile" className="w-10 h-10 ml-2  rounded-full cursor-pointer hover:ring-2 hover:ring-blue-500" />
+                    {user.profile && user.profile.avatar ?
+                    (<img src={user.profile?.avatar || ""}  onClick = {() => navigate(`/profile/${speakingURL(user.username)}_${user._id}`)} alt="Profile" 
+                    className="w-10 h-10 ml-2  object-cover rounded-full cursor-pointer hover:ring-2 hover:ring-blue-500" />)
+                    :
+                    (<div onClick = {() => navigate(`/profile/${speakingURL(user.username)}_${user._id}`)} 
+                    className="w-10 h-10 ml-2 bg-gray-500 flex items-center justify-center text-white text-lg font-bold rounded-full cursor-pointer hover:ring-2 hover:ring-blue-500">
+                        {user.username.charAt(0).toUpperCase()}
+                    </div>)
+                    }
                     
                 </>
                 
