@@ -9,6 +9,7 @@ import coookieParser from 'cookie-parser';
 import connectDatabase from './config/database.config.js';
 import { initSocket } from './services/socket.service.js';
 import clientRouter from './routes/client/index.route.js';
+import AdminRouter from './routes/admin/index.route.js';
 
 const app = express();
 const PORT = 10000;
@@ -33,6 +34,7 @@ app.use(coookieParser());
 app.use(express.json());
 
 app.use("/api", clientRouter);
+app.use("/api/admin", AdminRouter);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
