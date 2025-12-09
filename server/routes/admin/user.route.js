@@ -12,4 +12,6 @@ router.delete('/deleteUser/:id', userController.deleteUser);
 
 router.get('/total-pages', userController.getTotalUserPages);
 
+router.get('/total-users', userController.getTotalUsers);
+
 export default router;

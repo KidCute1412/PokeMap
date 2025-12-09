@@ -6,9 +6,9 @@ const router = express.Router();
 
 router.get('/listPosts', postController.getAllPosts);
 
-router.get('/detail/:postId', postController.getPostById);
+router.get('/detail/:postId', postController.getPostById); // Cũng không cần thiết
 
-router.get('/total-pages', postController.getTotalPages);
+router.get('/total-pages', postController.getTotalPages); // Không cần thiết
 
 router.patch('/warn/:postId', postController.warnPost);
 

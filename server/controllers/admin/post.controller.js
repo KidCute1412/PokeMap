@@ -2,11 +2,16 @@ import * as postService from '../../services/post.service.js';
 
 export const getAllPosts = async (req, res) => {
     try {
-        const posts = await postService.getAllPosts();
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const numberOfPosts = await postService.countPosts();
+        const totalPages = Math.ceil(numberOfPosts / limit);
+        const posts = await postService.getAllPosts({page: page, limit: limit});
         res.json({
             success: true,
             message: 'Posts retrieved successfully',
-            data: posts
+            data: posts,
+            numberOfPages: totalPages
         });
     } catch (error) {
         res.json({
@@ -61,11 +66,12 @@ export const getTotalPages = async (req, res) => {
 
 export const warnPost = async (req, res) => {   
     const { postId } = req.params;
+    console.log("Warning post ID:", postId);
     const { warningType, description, warnedBy } = req.body;
     
     try {
         // Validate required fields
-        if (!warningType || !warnedBy) {
+        if (!warningType) {
             return res.status(400).json({
                 success: false,
                 message: 'warningType and warnedBy are required'
