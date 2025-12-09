@@ -1,7 +1,6 @@
 import React, { Suspense, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Stage } from "@react-three/drei";
-import { useLoader } from "@react-three/fiber";
+import { OrbitControls, useLoader } from "@react-three/drei";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 
 export function Model({ url }) {
