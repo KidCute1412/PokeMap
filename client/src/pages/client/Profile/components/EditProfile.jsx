@@ -12,7 +12,7 @@ export default function EditProfile() {
     const navigate = useNavigate();
 
 
-    const [avatar, setAvatar] = useState(user?.profile.avatar || '');
+    const [avatar, setAvatar] = useState(user?.profile?.avatar || '');
     const [avatarFile, setAvatarFile] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [isSubmit, setIsSubmit] = useState(false);
