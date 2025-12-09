@@ -16,6 +16,7 @@
     "@react-three/fiber": "^9.4.0",
     "@tailwindcss/vite": "^4.1.16",
     "@tinymce/tinymce-react": "^6.3.0",
+    "animate.css": "^4.1.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "just-validate": "^4.3.0",

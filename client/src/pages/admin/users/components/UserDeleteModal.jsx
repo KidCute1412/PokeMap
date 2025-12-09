@@ -1,5 +1,6 @@
 import { AlertTriangle } from 'lucide-react';
 import {useEffect} from "react";
+import "animate.css";
 const DeleteConfirmModal = ({ user, onClose }) => {
   if (!user) return null;
   // Handle click outside to close modal
@@ -32,8 +33,8 @@ const DeleteConfirmModal = ({ user, onClose }) => {
   }
   
   return (
-    <div className="fixed inset-0 bg-white/50 bg-opacity-50 flex items-center justify-center p-4 z-50" >
-      <div className="bg-white rounded-2xl shadow-2xl max-w-[70%] h-[70%] overflow-y-auto w-full">
+    <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center p-4 z-50 " >
+      <div className="bg-white rounded-2xl shadow-2xl max-w-[70%] h-[90%] overflow-y-auto scrollbar-hide w-full animate__animated animate__zoomIn">
         {/* Modal Header */}
         <div className="flex items-center gap-4 p-8 border-b border-red-200 bg-gradient-to-r from-red-50 to-orange-50">
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
