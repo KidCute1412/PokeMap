@@ -1,6 +1,4 @@
 import { User } from '../models/user.model.js';
-import { Follow } from '../models/follow.model.js'; // Import Follow model
-import { decodeBase64 } from 'bcryptjs';
 import moongoose from 'mongoose';
 import speakingURL from "speakingurl"
 export const getAllUsers = async ({page, limit}) => {

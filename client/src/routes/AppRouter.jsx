@@ -10,6 +10,7 @@ import UserAdminPage from "@/pages/admin/users/UserAdminPage.jsx";
 import PostAdminPage from "@/pages/admin/posts/PostAdminPage.jsx";
 import ProtectedRouter from "@/routes/ProtectedRouter.jsx";
 import EditProfile from "@/pages/client/Profile/components/EditProfile";
+import ChangePassword from "@/pages/client/Profile/components/ChangePassword";
 const routers = createBrowserRouter([
     {
         path : "/",
@@ -29,6 +30,10 @@ const routers = createBrowserRouter([
             {
                 path: "profile/edit/",
                 element: <EditProfile></EditProfile>
+            },
+            {
+                path: "profile/change-password",
+                element: <ChangePassword></ChangePassword>
             }
         ]
     },

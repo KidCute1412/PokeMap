@@ -26,7 +26,18 @@ const userSchema = new mongoose.Schema({
         default: ''
     },
     profile: {
-        avatar: String
+        avatar: {
+            type: String,
+            default: ''
+        },
+        followers: {
+            type: Number,
+            default: 0
+        },
+        following: {
+            type: Number,
+            default: 0
+        }
     },
     emailVerified: {
         type: Boolean,

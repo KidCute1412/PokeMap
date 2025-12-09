@@ -71,7 +71,7 @@ export default function EditProfile() {
         formData.append('sex', e.target.sex.value);
         formData.append('description', e.target.description.value);
         // Append avatar file if changed with user.profile.avatar
-        if (avatarFile && avatar !== user?.profile.avatar) {
+        if (avatarFile && avatar !== user?.profile?.avatar) {
             formData.append('avatar', avatarFile);
         }
 
@@ -206,6 +206,12 @@ export default function EditProfile() {
                         </div>
 
                         {/* Description */}
+                        <div className="space-y-2">
+                            <label className="flex items-center space-x-2 text-sm font-medium text-gray-300">
+                                <Users className="w-4 h-4" />
+                                <span>Describe yourself</span>
+                            </label>
+                        </div>
                         <TextEditor value = {user?.description || ""} onEditChange = {handleEditorChange}
                         />
                         <input type = "hidden" id = "description" name = "description"></input>
