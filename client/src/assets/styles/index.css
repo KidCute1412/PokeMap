@@ -1,29 +1,36 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "leaflet/dist/leaflet.css";
 
 
 @custom-variant dark (&:is(.dark *));
 
 /* Hide scrollbar cross-browser */
 .scrollbar-hide {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;     /* Firefox */
-}
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;             /* Chrome, Safari, Opera */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
-body{
-    background-color: black;
-    background-image: linear-gradient(to bottom, #000000, rgb(12, 12, 14),rgb(13, 13, 27), rgb(41, 41, 90), #474db9);
-    background-attachment: fixed;
-    background-size: cover;
-    background-repeat: no-repeat;
-    padding-bottom: 100px;
-    min-height: 100vh;
-    font-size: 18px;
-    /* font-family: 'Montserrat', sans-serif; */
-}@theme inline {
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari, Opera */
+}
+
+body {
+  background-color: black;
+  background-image: linear-gradient(to bottom, #000000, rgb(12, 12, 14), rgb(13, 13, 27), rgb(41, 41, 90), #474db9);
+  background-attachment: fixed;
+  background-size: cover;
+  background-repeat: no-repeat;
+  padding-bottom: 100px;
+  min-height: 100vh;
+  font-size: 18px;
+  /* font-family: 'Montserrat', sans-serif; */
+}
+
+@theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -134,7 +141,41 @@ body{
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Pokemon Map Marker Styles */
+.pokemon-marker {
+  background: transparent !important;
+  border: none !important;
+  cursor: pointer;
+}
+
+.pokemon-marker:hover {
+  transform: scale(1.1);
+  transition: transform 0.2s;
+}
+
+/* Make Leaflet map panes transparent */
+.leaflet-container {
+  background: transparent !important;
+}
+
+.leaflet-tile-pane {
+  opacity: 0 !important;
+}
+
+.leaflet-shadow-pane {
+  opacity: 0 !important;
+}
+
+.leaflet-overlay-pane {
+  opacity: 1 !important;
+}
+
+.leaflet-map-pane {
+  background: transparent !important;
 }
