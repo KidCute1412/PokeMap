@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
-import PokemonMap from "@/components/PokemonMap.jsx";
-import PokemonList from "@/components/PokemonList.jsx";
-import MarkerInfoModal from "@/components/MarkerInfoModal.jsx";
+import PokemonMap from "@/components/pokemon/PokemonMap.jsx";
+import PokemonList from "@/components/pokemon/PokemonList.jsx";
+import MarkerInfoModal from "@/components/pokemon/MarkerInfoModal.jsx";
 import { getPokemonSpawnLocations } from "@/utils/encounterParser.js";
+import Loading from "@/components/common/ClientLoading.jsx";
 
 export default function MapPage() {
     const [markers, setMarkers] = useState([]);
@@ -269,12 +270,14 @@ export default function MapPage() {
     };
 
     return (
+        isLoadingState ? <Loading></Loading> :
         <div className="min-h-screen pt-20 px-4">
-            <div className="flex gap-4 h-[calc(100vh-5rem)]">
-                {/* Left Sidebar - Pokemon List */}
-                <div className="w-96 flex-shrink-0">
+            {/* Right Side - Map (now full width) */}
+            <div className="w-full h-[calc(100vh-5rem)] rounded-2xl overflow-hidden shadow-2xl border-2 border-gray-700 bg-gray-900/50 relative">
+                {/* Left Sidebar - Embedded inside map */}
+                <div className="absolute left-0 top-0 w-96 h-full z-10 bg-gray-900/90 backdrop-blur-sm border-r border-gray-700">
                     {isLoadingState ? (
-                        <div className="h-full flex items-center justify-center bg-gray-900/80 rounded-lg border border-gray-700">
+                        <div className="h-full flex items-center justify-center">
                             <div className="text-white">Loading map state...</div>
                         </div>
                     ) : (
@@ -287,24 +290,21 @@ export default function MapPage() {
                     )}
                 </div>
 
-                {/* Right Side - Map */}
-                <div className="flex-1 rounded-2xl overflow-hidden shadow-2xl border-2 border-gray-700 bg-gray-900/50">
-                    {/* Map Title */}
-                    <div className="px-4 py-2 border-b border-gray-700 bg-gray-900/80">
-                        <h2 className="text-white text-lg font-semibold">
-                            Pokemon Ultramoon khu vực 1
-                        </h2>
-                    </div>
+                {/* Map Title */}
+                <div className="px-4 py-2 border-b border-gray-700 bg-gray-900/80 ml-96">
+                    <h2 className="text-white text-lg font-semibold">
+                        Pokemon Ultramoon khu vực 1
+                    </h2>
+                </div>
 
-                    {/* Map Container */}
-                    <div className="h-[calc(100%-60px)]">
-                        <PokemonMap
-                            className="rounded-b-2xl"
-                            markers={markers}
-                            onMapClick={handleMapClick}
-                            onMarkerClick={handleMarkerClick}
-                        />
-                    </div>
+                {/* Map Container */}
+                <div className="h-[calc(100%-60px)] ml-96">
+                    <PokemonMap
+                        className="rounded-b-2xl"
+                        markers={markers}
+                        onMapClick={handleMapClick}
+                        onMarkerClick={handleMarkerClick}
+                    />
                 </div>
             </div>
 

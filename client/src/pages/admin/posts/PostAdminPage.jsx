@@ -5,7 +5,7 @@ import PostDetailModal from "@/pages/admin/posts/components/PostDetailModal";
 import WarnModal from "@/pages/admin/posts/components/WarnModal";
 import DeleteModal from "@/pages/admin/posts/components/DeleteModal";
 import PaginationComponent from '@/components/common/Pagination';
-import Loading from '@/components/common/Loading';
+import Loading from '@/components/common/AdminLoading';
 const PostManagementDashboard = () => {
   const [posts, setPosts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);

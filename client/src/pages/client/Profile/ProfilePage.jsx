@@ -2,7 +2,7 @@ import PostCard from "@/pages/client/components/posts/PostCard";
 import ShortcutToMap from "@/components/common/ShortcutToMap";
 import {useState, useEffect} from "react";
 import {useParams, useNavigate} from "react-router-dom";
-import Loading from "@/components/common/Loading";
+import Loading from "@/components/common/ClientLoading";
 
 // username, email, sex, followers, following, avatar
 function ProfileHeader(){

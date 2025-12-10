@@ -5,7 +5,7 @@ import UserDetailModal from '@/pages/admin/users/components/UserDetailModal';
 import DeleteConfirmModal from '@/pages/admin/users/components/UserDeleteModal';
 import { useSearchParams } from 'react-router-dom';
 import {toast} from "sonner";
-import Loading from '@/components/common/Loading';
+import Loading from '@/components/common/AdminLoading';
 // User Detail Modal Component
 
 

@@ -142,7 +142,7 @@ export default function PokemonMap({
             <MapContainer
                 center={center}
                 zoom={2}
-                minZoom={-1}
+                minZoom={0}
                 maxZoom={5}
                 style={{ height: '100%', width: '100%', zIndex: 0, background: 'transparent' }}
                 crs={L.CRS.Simple}
