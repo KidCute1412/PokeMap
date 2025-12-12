@@ -1,7 +1,10 @@
 import { Post } from '../models/post.model.js'
+import {Like} from '../models/like.model.js'
+import {Follow} from '../models/follow.model.js'
 import { PostWarning } from '../models/postModeration.model.js'
 import {User} from '../models/user.model.js';
 import sendEmail from '../config/email.config.js';
+import mongoose from 'mongoose';
 export const getAllPosts = async ({page, limit}) => {
     const skip = (page - 1) * limit;
 
@@ -171,4 +174,268 @@ export const deletePost = async (postId) => {
         isDeleted: true,
         deletedAt: new Date()
     }, { new: true });
+}
+
+
+export const createPost = async ({content, images, user}) => {
+    const newPost = await Post.create({
+        content,
+        images,
+        user
+    });
+    return newPost; 
+}
+export const getPostsInHome = async ({viewer, limit, exclude_ids}) => {
+
+    
+    
+    console.log ("Viewer in home: ", viewer);
+    const userPosts = await Post.aggregate([
+        {
+            $match: {isDeleted: { $ne: true } }
+        },
+        {
+            $match: { _id: { $nin: exclude_ids.map(id => new mongoose.Types.ObjectId(id)) }}
+        },
+        {
+            $sample: { size: limit }
+        },
+        {
+            $lookup : {
+                from : "users",
+                localField : "user",
+                foreignField : "_id",
+                as : "userInfo"
+            }
+        },
+        {
+            $lookup : {
+                from: "comments",
+                localField: "_id",
+                foreignField: "post",
+                as: "comments"
+            }
+        },
+        {
+            $lookup: {
+                from: "likes",
+                localField: "_id",
+                foreignField: "post",
+                as: "likes"
+            }
+        },
+            // is Liked by viewer
+        {
+            $lookup : {
+                from : "likes",
+                let : {postId : "$_id"},
+                pipeline : [
+                    {
+                        $match : {
+                            $expr : {
+                                $and : [
+                                    {$eq : ["$post", "$$postId"]},
+                                    {$eq : ["$user", viewer ? new mongoose.Types.ObjectId(viewer._id) : null]}
+                                ]
+                            }
+                        }
+                    }
+                ],
+                as : "isLikedByViewer"
+            }
+        }
+        ,
+        {
+            $lookup : {
+                from : "follows",
+                let : {postUserId : "$user"},
+                pipeline : [
+                    {
+                        $match : {
+                            $expr : {
+                                $and : [
+                                    {$eq : ["$follower", viewer ? new mongoose.Types.ObjectId(viewer._id) : null]},
+                                    {$eq : ["$following", "$$postUserId"]}
+                                ]
+                            }
+                        }
+                    }
+                ],
+                as : "followInfo"    
+            }
+        }
+        ,
+        {
+            $addFields: {
+                'comments': { $size: "$comments" },
+                'likes': { $size: "$likes" },
+                'username' : { $arrayElemAt: [ "$userInfo.username", 0 ] },
+                'avatar' : { $arrayElemAt: [ "$userInfo.profile.avatar", 0 ] },
+                'isFollowing' : { $gt : [ {$size : "$followInfo"}, 0 ] },
+                'isLiked' : { $gt : [ {$size : "$isLikedByViewer"}, 0 ] },
+                'owner_id' : { $arrayElemAt: [ "$userInfo._id", 0 ] }
+            }
+        },
+        {
+            $project: {
+                userInfo: 0,
+                followInfo: 0,
+                isLikedByViewer: 0
+            }
+        }
+    ])
+
+    console.log("getUserPosts result:", userPosts.length, "posts found");
+    return userPosts;
+}
+
+export const getUserPosts = async ({userId, viewer}) => {
+    
+    console.log("getUserPosts called with userId:", userId, "type:", typeof userId);
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+    console.log("Converted to ObjectId:", userObjectId);
+    
+    const userPosts = await Post.aggregate([
+        {
+            $match: { user:  userObjectId, isDeleted: { $ne: true } }
+        },
+        {
+            $sort: { createdAt: -1 },
+        },
+        {
+            $lookup : {
+                from : "users",
+                localField : "user",
+                foreignField : "_id",
+                as : "userInfo"
+            }
+        },
+        {
+            $lookup : {
+                from: "comments",
+                localField: "_id",
+                foreignField: "post",
+                as: "comments"
+            }
+        },
+        {
+            $lookup: {
+                from: "likes",
+                localField: "_id",
+                foreignField: "post",
+                as: "likes"
+            }
+        },
+            // is Liked by viewer
+        {
+            $lookup : {
+                from : "likes",
+                let : {postId : "$_id"},
+                pipeline : [
+                    {
+                        $match : {
+                            $expr : {
+                                $and : [
+                                    {$eq : ["$post", "$$postId"]},
+                                    {$eq : ["$user", viewer ? new mongoose.Types.ObjectId(viewer._id) : null]}
+                                ]
+                            }
+                        }
+                    }
+                ],
+                as : "isLikedByViewer"
+            }
+        }
+        ,
+        {
+            $lookup : {
+                from : "follows",
+                let : {postUserId : "$user"},
+                pipeline : [
+                    {
+                        $match : {
+                            $expr : {
+                                $and : [
+                                    {$eq : ["$follower", viewer ? new mongoose.Types.ObjectId(viewer._id) : null]},
+                                    {$eq : ["$following", "$$postUserId"]}
+                                ]
+                            }
+                        }
+                    }
+                ],
+                as : "followInfo"    
+            }
+        }
+        ,
+        {
+            $addFields: {
+                'comments': { $size: "$comments" },
+                'likes': { $size: "$likes" },
+                'username' : { $arrayElemAt: [ "$userInfo.username", 0 ] },
+                'avatar' : { $arrayElemAt: [ "$userInfo.profile.avatar", 0 ] },
+                'isFollowing' : { $gt : [ {$size : "$followInfo"}, 0 ] },
+                'isLiked' : { $gt : [ {$size : "$isLikedByViewer"}, 0 ] },
+                'owner_id' : { $arrayElemAt: [ "$userInfo._id", 0 ] }
+            }
+        },
+        {
+            $project: {
+                userInfo: 0,
+                followInfo: 0,
+                isLikedByViewer: 0
+            }
+        }
+    ])
+
+    console.log("getUserPosts result:", userPosts.length, "posts found");
+    return userPosts;
+}
+
+
+
+export const likePost = async ({postId, user}) => {
+    const existingLike = await Like.findOne({post: postId, user: user._id});
+    if (existingLike) {
+        // Unlike
+        await Like.deleteOne({ _id: existingLike._id });
+        return { message: "Post unliked" };
+    } else {
+        // Like
+        const newLike = new Like({
+            post: postId,
+            user: user._id
+        });
+        await newLike.save();
+        return { message: "Post liked" };
+    }
+}
+
+export const followUserFromPost = async ({postId, userId}) => {
+    // is UserId owner of the post
+    const post = await Post.findById(postId);
+    if (!post) {
+        throw new Error('Post not found');
+    }
+    const postOwnerId = post.user.toString();
+
+    // if (postOwnerId === userId) {
+    //     throw new Error('User cannot follow themselves');
+    // }
+
+    const existingFollow = await Follow.findOne({follower: userId, following: postOwnerId});
+    if (existingFollow) {
+        // Unfollow
+        await Follow.deleteOne({ _id: existingFollow._id });
+        return { message: "User unfollowed" };
+    }
+    else {
+        // Follow
+        const newFollow = new Follow({
+            follower: userId,
+            following: postOwnerId
+        });
+        await newFollow.save();
+        return { message: "User followed" };
+    }
+
 }

@@ -3,17 +3,28 @@ import { X, ChevronLeft, ChevronRight, Download, Share } from "lucide-react";
 
 export default function ImageDetailModal({ images, currentIndex, onClose }) {
     const [currentImageIndex, setCurrentImageIndex] = useState(currentIndex);
+    const [animationClass, setAnimationClass] = useState('animate__fadeInUp');
 
     useEffect(() => {
         setCurrentImageIndex(currentIndex);
     }, [currentIndex]);
 
+
     const goToPrevious = () => {
-        setCurrentImageIndex(prev => prev > 0 ? prev - 1 : images.length - 1);
+        setAnimationClass('animate__fadeOutRight');
+        setTimeout (() => {
+            setCurrentImageIndex(prev => prev > 0 ? prev - 1 : images.length - 1);
+            setAnimationClass('animate__fadeInLeft');
+        }, 300);
+        
     };
 
     const goToNext = () => {
-        setCurrentImageIndex(prev => prev < images.length - 1 ? prev + 1 : 0);
+        setAnimationClass('animate__fadeOutLeft');
+        setTimeout (() => {
+            setCurrentImageIndex(prev => prev < images.length - 1 ? prev + 1 : 0);
+            setAnimationClass('animate__fadeInRight');
+        }, 300);
     };
 
     const handleKeyPress = (e) => {
@@ -36,11 +47,11 @@ export default function ImageDetailModal({ images, currentIndex, onClose }) {
                 className="absolute inset-0"
                 onClick={onClose}
             />  
-            <div className="bg-gray-900/80 rounded-2xl shadow-2xl max-w-[90vw] h-[90vh] w-full overflow-hidden relative z-10">
+            <div className="bg-gray-900/80 rounded-2xl shadow-2xl max-w-[90vw] h-[90vh] w-full overflow-hidden relative z-10 animate__animated animate__zoomIn animate__fast">
                 {/* Close button */}
                 <button
                     onClick={onClose}
-                    className="absolute top-4 right-4 z-10 p-2 bg-black bg-opacity-50 rounded-full text-white hover:bg-opacity-70 transition-all"
+                    className="absolute cursor-pointer top-4 right-4 z-10 p-2 bg-black bg-opacity-50 rounded-full text-white hover:bg-opacity-70 transition-all"
                 >
                     <X className="w-6 h-6" />
                 </button>
@@ -50,13 +61,13 @@ export default function ImageDetailModal({ images, currentIndex, onClose }) {
                     <>
                         <button
                             onClick={goToPrevious}
-                            className="absolute left-2 top-1/2 transform -translate-y-1/2 p-2 bg-black bg-opacity-50 rounded-full text-white hover:bg-opacity-70 transition-all z-10"
+                            className="absolute cursor-pointer left-2 top-1/2 transform -translate-y-1/2 p-2 bg-black bg-opacity-50 rounded-full text-white hover:bg-opacity-70 transition-all z-10"
                         >
                             <ChevronLeft className="w-5 h-5" />
                         </button>
                         <button
                             onClick={goToNext}
-                            className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 bg-black bg-opacity-50 rounded-full text-white hover:bg-opacity-70 transition-all z-10"
+                            className="absolute cursor-pointer right-2 top-1/2 transform -translate-y-1/2 p-2 bg-black bg-opacity-50 rounded-full text-white hover:bg-opacity-70 transition-all z-10"
                         >
                             <ChevronRight className="w-5 h-5" />
                         </button>
@@ -66,9 +77,11 @@ export default function ImageDetailModal({ images, currentIndex, onClose }) {
                 {/* Main image */}
                 <div className="p-4 flex justify-center items-center h-[80%]">
                     <img
+                        key={currentImageIndex}
                         src={images[currentImageIndex]}
                         alt={"Image " + (currentImageIndex + 1)}
-                        className="max-w-full h-full object-contain rounded-lg shadow-lg"
+                        className={`max-w-full h-full object-contain rounded-lg shadow-lg animate__animated ${animationClass}`}
+
                     />
                 </div>
 
@@ -125,7 +138,7 @@ export default function ImageDetailModal({ images, currentIndex, onClose }) {
                                 className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${
                                     index === currentImageIndex
                                         ? 'border-blue-500 opacity-100'
-                                        : 'border-gray-600 opacity-60 hover:opacity-80'
+                                        : 'border-gray-600 opacity-60 hover:opacity-80 cursor-pointer'
                                 }`}
                             >
                                 <img

@@ -5,6 +5,10 @@ const mapPinSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    pokemonName: {
+        type: String,
+        default: ''
+    },
     userID: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Users',
@@ -17,7 +21,19 @@ const mapPinSchema = new mongoose.Schema({
     longitude: {
         type: Number,
         required: true
-    }, 
+    },
+    notes: {
+        type: String,
+        default: ''
+    },
+    location: {
+        type: String,
+        default: ''
+    },
+    percentage: {
+        type: Number,
+        default: 0
+    },
     status: {
         type: Boolean,
         default: false

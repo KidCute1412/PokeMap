@@ -1,6 +1,8 @@
 import * as userService from "../../services/user.service.js";
 import uploadToCloudinary from "../../config/cloudinary.config.js";
 import fs from 'fs';
+import {User} from "../../models/user.model.js";
+import * as authHelper from '../../helpers/auth.helper.js';
 export async function getUserProfile (req, res) {
     try{
         const {id, username} = req.query;
@@ -43,6 +45,40 @@ export async function editUserProfile (req, res) {
         res.status(500).json({
             success: false,
             message: e.message || "Server error updating user profile"
+        })
+    }
+}
+
+export async function changePassword (req, res) {
+    try {   
+        const userId =  req.user.id;
+        const { currentPassword, newPassword} = req.body;
+        // verify current password
+        const password = await User.findById(userId).select('password');
+        const isMatch = await authHelper.comparePassword(currentPassword, password.password);
+        if (!isMatch) {
+            return res.status(400).json({
+                success: false,
+                message: "Current password is incorrect"
+            });
+        }
+        // update to new password
+        const result = await User.findByIdAndUpdate(
+            userId,
+            { password: await authHelper.hashPassword(newPassword) },
+            { new: true }
+        ).select('-password');
+        res.status(200).json({
+            success: true,
+            message: "Password changed successfully",
+            data: result
+        });
+
+    }
+    catch (e) {
+        res.status(500).json({
+            success: false,
+            message: e.message || "Server error changing password"
         })
     }
 }

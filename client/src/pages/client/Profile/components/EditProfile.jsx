@@ -5,14 +5,14 @@ import {useAuth} from "@/routes/ProtectedRouter.jsx";
 import TextEditor from "@/components/common/TextEditor.jsx";    
 import JustValidate from "just-validate";
 import {toast} from "sonner";
-
+import speakingURL from "speakingurl"
 export default function EditProfile() {
     const {user, setUser} = useAuth();
 
     const navigate = useNavigate();
 
 
-    const [avatar, setAvatar] = useState(user?.profile.avatar || '');
+    const [avatar, setAvatar] = useState(user?.profile?.avatar || '');
     const [avatarFile, setAvatarFile] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [isSubmit, setIsSubmit] = useState(false);
@@ -71,7 +71,7 @@ export default function EditProfile() {
         formData.append('sex', e.target.sex.value);
         formData.append('description', e.target.description.value);
         // Append avatar file if changed with user.profile.avatar
-        if (avatarFile && avatar !== user?.profile.avatar) {
+        if (avatarFile && avatar !== user?.profile?.avatar) {
             formData.append('avatar', avatarFile);
         }
 
@@ -92,7 +92,7 @@ export default function EditProfile() {
         .then (data => {
                 toast.success("Cập nhật hồ sơ thành công");
                 setUser(data.data);
-                navigate(`/profile/${data.data.username}_${data.data._id}`);
+                navigate(`/profile/${speakingURL(data.data.username)}_${data.data._id}`);
         })
         .catch (err => {
             console.error("Error updating profile:", err);
@@ -111,7 +111,7 @@ export default function EditProfile() {
                 {/* Header */}
                 <div className="flex items-center space-x-4 mb-8">
                     <button
-                        onClick={() => navigate('/profile')}
+                        onClick={() => navigate(-1)}
                         className="p-2 hover:bg-gray-800 rounded-full transition-colors"
                     >
                         <ArrowLeft className="w-6 h-6 text-gray-400" />
@@ -206,6 +206,12 @@ export default function EditProfile() {
                         </div>
 
                         {/* Description */}
+                        <div className="space-y-2">
+                            <label className="flex items-center space-x-2 text-sm font-medium text-gray-300">
+                                <Users className="w-4 h-4" />
+                                <span>Describe yourself</span>
+                            </label>
+                        </div>
                         <TextEditor value = {user?.description || ""} onEditChange = {handleEditorChange}
                         />
                         <input type = "hidden" id = "description" name = "description"></input>
@@ -216,7 +222,7 @@ export default function EditProfile() {
                     <div className="flex space-x-4">
                         <button
                             type="button"
-                            onClick={() => navigate(`/profile/${user.username}_${user.id}`)}
+                            onClick={() => navigate(`/profile/${speakingURL(user.username)}_${user.id}`)}
                             className="flex-1 px-6 py-4 cursor-pointer bg-gray-700 hover:bg-gray-600 text-white rounded-xl transition-colors font-medium text-lg"
                         >
                             Hủy

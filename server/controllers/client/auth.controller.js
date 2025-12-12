@@ -211,3 +211,31 @@ export const getMe = async (req, res) => {
         });
     }
 };
+
+
+// LOGOUT
+export const logout = async (req, res) => {
+    try {
+        if (!req.cookies.accessToken) {
+            return res.status(400).json({
+                success: false,
+                message: 'No active session found'
+            });
+        }
+        res.clearCookie("accessToken", {
+            httpOnly: false,
+            secure: false,
+            sameSite: 'lax'
+        });
+        res.status(200).json({
+            success: true,
+            message: 'Logged out successfully'
+        });
+    } catch (error) {
+        console.error('Logout error:', error.message);
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Server error during logout'
+        });
+    }
+};

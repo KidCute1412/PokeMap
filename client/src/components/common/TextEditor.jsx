@@ -19,7 +19,9 @@ export default function TinyMCEEditor({
           height: 300,
           menubar: !isReadOnly,
           directionality: "ltr",
-          language: "vi",
+          skin: "oxide-dark",
+          theme : "silver",
+          content_css: "dark",
           toolbar: `undo redo | blocks | bold italic forecolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help`,
           plugins: [
             "advlist",
