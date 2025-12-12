@@ -42,9 +42,17 @@ export const createPost = async (req, res) => {
     });
 };
 
-export const getPosts = (req, res) => {
-    // Your logic here
-    res.json({ message: "Create post" });
+export const getPostsInHome = async (req, res) => {
+    const viewer = req.user || null;
+    const limit = req.body.limit || 5;
+    const exclude_ids = req.body.exclude_ids || [];
+    const results = await postService.getPostsInHome ({viewer : viewer, limit : limit, exclude_ids : exclude_ids});
+    res.json ({
+        status : "success",
+        message : "Posts fetched successfully",
+        data : results
+    });
+
 };
 
 export const getUserPosts = async (req, res) => {

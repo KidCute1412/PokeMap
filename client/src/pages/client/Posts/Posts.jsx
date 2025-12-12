@@ -1,8 +1,8 @@
 import PostCard from "@/pages/client/Posts/components/PostCard.jsx";
 import CreatePostModal from "./components/CreatePostModal";
-import {useState} from "react";
+import {useState, memo} from "react";
 
-export default function Posts({isOwnerProfile = false, posts = []}){
+const Posts = memo(function Posts({isOwnerProfile = false, posts = []}) {
     const [openCreatePostModal, setOpenCreatePostModal] = useState(false);
 
 
@@ -22,7 +22,7 @@ export default function Posts({isOwnerProfile = false, posts = []}){
                 </div>
             )}
             {posts.map(post => (
-                <PostCard 
+                <PostCard
                     key={post._id}
                     data = {post}
                 />
@@ -35,4 +35,6 @@ export default function Posts({isOwnerProfile = false, posts = []}){
             )}
         </div>
     );
-}
+});
+
+export default Posts;

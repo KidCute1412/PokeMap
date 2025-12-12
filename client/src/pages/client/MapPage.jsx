@@ -291,16 +291,16 @@ export default function MapPage() {
                 </div>
 
                 {/* Map Title */}
-                <div className="px-4 py-2 border-b border-gray-700 bg-gray-900/80 ml-96">
+                <div className="px-4 py-2 border-b border-gray-700 bg-gray-900/80 ml-96 z-20 relative">
                     <h2 className="text-white text-lg font-semibold">
-                        Pokemon Ultramoon khu vực 1
+                        Pokemon Ultramoon
                     </h2>
                 </div>
 
                 {/* Map Container */}
-                <div className="h-[calc(100%-60px)] ml-96">
+                <div className="absolute top-10 left-96 right-0 bottom-0">
                     <PokemonMap
-                        className="rounded-b-2xl"
+                        className="w-full h-full rounded-b-2xl"
                         markers={markers}
                         onMapClick={handleMapClick}
                         onMarkerClick={handleMarkerClick}

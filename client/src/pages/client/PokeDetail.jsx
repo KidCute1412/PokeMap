@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { TYPE_COLORS } from '@/components/pokemon/constants.js';
-
+import Loading from '@/components/common/ClientLoading.jsx';
 const STAT_COLORS = {
   hp: "bg-red-500",
   attack: "bg-orange-500",
@@ -116,15 +116,13 @@ export default function PokeDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
-      </div>
+      <Loading text="Loading Pokemon Details..." />
     );
   }
 
   if (error || !pokemon) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center text-white">
+      <div className="min-h-screen flex items-center justify-center text-white">
         <p>Error: {error || "No Pokemon Data"}</p>
         <button onClick={() => navigate(-1)} className="ml-4 text-blue-400 underline">Go Back</button>
       </div>
@@ -168,9 +166,9 @@ export default function PokeDetail() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 py-8 px-4 font-sans flex justify-center">
+    <div className="min-h-screen text-slate-100 py-8 px-4 font-sans flex justify-center">
       {/* CARD CONTAINER CHÍNH */}
-      <div className="w-full max-w-4xl bg-slate-800 rounded-[2rem] border-2 border-slate-600 shadow-2xl overflow-hidden relative">
+      <div className="w-full max-w-4xl bg-slate-800 rounded-[2rem] border-2 border-slate-600 shadow-2xl overflow-hidden relative animate___animated animate__fadeIn">
 
         {/* Nút Back */}
         <button

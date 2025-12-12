@@ -1,13 +1,13 @@
 // @ts-expect-error
 import pikachu from "@/assets/icons/pikachu.jpg";
 import "animate.css";
-
-export default function Loading({ src, size = "w-16 h-16", text = "Loading..." }) {
+import {cn} from "@/lib/utils.js";
+export default function Loading({ src, size = "w-16 h-16", text = "Loading..." , className=""}) {
     if (!src) {
         src = pikachu;
     }
     return (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div className={cn(`fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50`, className)}>
             <div className="bg-black/30 rounded-3xl shadow-2xl p-8 max-w-sm w-full text-center animate__animated animate__zoomIn animate__faster">
                 <div className="flex flex-col items-center space-y-6">
                     {src && (
@@ -22,7 +22,7 @@ export default function Loading({ src, size = "w-16 h-16", text = "Loading..." }
                     )}
 
                     <div className="space-y-2">
-                        <p className="text-gray-800 text-xl font-semibold">{text}</p>
+                        <p className="text-white text-xl font-semibold">{text}</p>
                         <div className="flex justify-center space-x-1">
                             <div className="w-2 h-2 bg-rose-400 rounded-full animate-pulse"></div>
                             <div className="w-2 h-2 bg-rose-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>

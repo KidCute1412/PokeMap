@@ -3,17 +3,28 @@ import { X, ChevronLeft, ChevronRight, Download, Share } from "lucide-react";
 
 export default function ImageDetailModal({ images, currentIndex, onClose }) {
     const [currentImageIndex, setCurrentImageIndex] = useState(currentIndex);
+    const [animationClass, setAnimationClass] = useState('animate__fadeInUp');
 
     useEffect(() => {
         setCurrentImageIndex(currentIndex);
     }, [currentIndex]);
 
+
     const goToPrevious = () => {
-        setCurrentImageIndex(prev => prev > 0 ? prev - 1 : images.length - 1);
+        setAnimationClass('animate__fadeOutRight');
+        setTimeout (() => {
+            setCurrentImageIndex(prev => prev > 0 ? prev - 1 : images.length - 1);
+            setAnimationClass('animate__fadeInLeft');
+        }, 300);
+        
     };
 
     const goToNext = () => {
-        setCurrentImageIndex(prev => prev < images.length - 1 ? prev + 1 : 0);
+        setAnimationClass('animate__fadeOutLeft');
+        setTimeout (() => {
+            setCurrentImageIndex(prev => prev < images.length - 1 ? prev + 1 : 0);
+            setAnimationClass('animate__fadeInRight');
+        }, 300);
     };
 
     const handleKeyPress = (e) => {
@@ -66,9 +77,11 @@ export default function ImageDetailModal({ images, currentIndex, onClose }) {
                 {/* Main image */}
                 <div className="p-4 flex justify-center items-center h-[80%]">
                     <img
+                        key={currentImageIndex}
                         src={images[currentImageIndex]}
                         alt={"Image " + (currentImageIndex + 1)}
-                        className="max-w-full h-full object-contain rounded-lg shadow-lg"
+                        className={`max-w-full h-full object-contain rounded-lg shadow-lg animate__animated ${animationClass}`}
+
                     />
                 </div>
 

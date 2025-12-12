@@ -63,7 +63,7 @@ export default function PokedexPage() {
   if (loading) return <Loading text="Fetching Pokedex..." />;
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white p-4 md:p-8 font-sans">
+    <div className="min-h-screen text-white p-4 md:p-8 font-sans">
       <div className="max-w-7xl mx-auto">
         
         <h1 className="text-4xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">

@@ -9,8 +9,8 @@ export default function ProfileHeader({isMiniCard = false, user_id_outside = nul
     console.log ("Authenticated user in ProfileHeader:", user);
     const [userProfile, setUserProfile] = useState();
     const {username_id} = useParams();
-    const username = username_id.split("_")[0];
-    const userId = username_id.split("_")[1];
+    const username = username_id?.split("_")[0];
+    const userId = username_id?.split("_")[1];
     const isOwnerProfile = userId === user?._id;
     const [isLoading, setIsLoading] = useState(true);
     const [showFullDescription, setShowFullDescription] = useState(false);

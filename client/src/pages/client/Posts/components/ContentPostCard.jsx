@@ -26,11 +26,15 @@ export default function ContentPostCard ({data, handleImageClick, className}) {
                 <div className="flex items-center space-x-3">
                     <MiniProfileAuthor userId = {data.owner_id} username = {data.username}>
                         <Link to = {data.owner_id ? `/profile/${data.username}_${data.owner_id}` : "#"} className="relative" onClick = {(e) => e.stopPropagation()}>
-                            <img 
+                            {data.avatar ? (<img 
                                 src={data.avatar || ""} 
                                 alt={data.username || "User Avatar"}
                                 className="w-16 h-16 rounded-full border-4 object-cover border-blue-400 hover:scale-105 hover:shadow-[0px_5px_10px] hover:shadow-blue-500 cursor-pointer transition-transform duration-300  "
-                            />
+                            />) :
+                            (<div className="w-16 h-16 rounded-full bg-gray-400 flex items-center justify-center text-white text-2xl font-bold border-4 border-blue-400 hover:scale-105 hover:shadow-[0px_5px_10px] hover:shadow-blue-500 cursor-pointer transition-transform duration-300">
+                                {data.username ? data.username.charAt(0).toUpperCase() : "U"}
+                            </div>)
+                            }
                             <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
                                 <span className="text-white text-xs">✦</span>
                             </div>

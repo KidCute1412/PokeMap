@@ -1,6 +1,6 @@
 // components/PokedexFilterBar.jsx
 import React, { useState } from 'react';
-import { Search, Filter, X } from 'lucide-react'; // Cần cài lucide-react
+import { Search, Filter} from 'lucide-react'; // Cần cài lucide-react
 import { TYPE_COLORS } from './constants.js';
 
 const PokedexFilterBar = ({ 
