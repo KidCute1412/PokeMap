@@ -111,7 +111,7 @@ export default function EditProfile() {
                 {/* Header */}
                 <div className="flex items-center space-x-4 mb-8">
                     <button
-                        onClick={() => navigate('/profile')}
+                        onClick={() => navigate(-1)}
                         className="p-2 hover:bg-gray-800 rounded-full transition-colors"
                     >
                         <ArrowLeft className="w-6 h-6 text-gray-400" />

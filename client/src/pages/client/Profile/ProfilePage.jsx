@@ -1,15 +1,19 @@
-import PostCard from "@/pages/client/components/posts/PostCard";
 import ShortcutToMap from "@/components/common/ShortcutToMap";
+import Posts from "@/pages/client/Posts/Posts";
 import {useState, useEffect} from "react";
 import {useParams, useNavigate} from "react-router-dom";
 import Loading from "@/components/common/ClientLoading";
-
+import {useAuth} from "@/routes/ProtectedRouter.jsx";
 // username, email, sex, followers, following, avatar
 function ProfileHeader(){
+
+    const {user} = useAuth();
+    console.log ("Authenticated user in ProfileHeader:", user);
     const [userProfile, setUserProfile] = useState();
     const {username_id} = useParams();
     const username = username_id.split("_")[0];
     const userId = username_id.split("_")[1];
+    const isOwnerProfile = userId === user?._id;
     const [isLoading, setIsLoading] = useState(true);
     const [showFullDescription, setShowFullDescription] = useState(false);
     const navigate = useNavigate();
@@ -108,90 +112,48 @@ function ProfileHeader(){
             </div>
 
             {/* Edit Profile Button */}
-            <button onClick = {() => {navigate(`/profile/edit`)}} className="w-full bg-purple-600 hover:bg-purple-700 text-white text-xl font-semibold py-4 rounded-2xl transition-colors cursor-pointer">
+            {isOwnerProfile && <button onClick = {() => {navigate(`/profile/edit`)}} className="w-full bg-purple-600 hover:bg-purple-700 text-white text-xl font-semibold py-4 rounded-2xl transition-colors cursor-pointer">
                 Edit Profile
-            </button>
+            </button>}
         </div>
     );
 }
 
 
-function Posts(){
-    const samplePosts = [
-        {
-            id: 1,
-            user: {
-                name: "Lucifer",
-                avatar: "https://i.pinimg.com/736x/e1/1d/96/e11d969662134a1cf1550a6a64401b0a.jpg"
-            },
-            timestamp: "9:00pm 11/1/2025",
-            content: "Nội dung bài viết",
-            likes: 1001,
-            comments: 1001,
-            isFollowing: false,
-            images: [
-                "https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=500",
-                "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500",
-                "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500"
-            ]
-        },
-        {
-            id: 2,
-            user: {
-                name: "Ash Ketchum",
-                avatar: "https://i.pinimg.com/736x/48/47/5d/48475d0b40a4b80c5bcb9a0061e83e5e.jpg"
-            },
-            timestamp: "8:30pm 11/1/2025",
-            content: "Just caught a rare Pikachu in the wild! The weather was perfect for Pokemon hunting today. #PokemonGO #Pikachu",
-            likes: 542,
-            comments: 89,
-            isFollowing: true,
-            images: [
-                "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500"
-            ]
-        },
-        {
-            id: 3,
-            user: {
-                name: "Misty Waters",
-                avatar: "https://i.pinimg.com/736x/b1/8c/a6/b18ca68d356b63a5ccbc9f68c4be9525.jpg"
-            },
-            timestamp: "7:15pm 11/1/2025",
-            content: "Beautiful sunset at the Pokemon Center today. Met some amazing trainers and their Pokemon companions!",
-            likes: 823,
-            comments: 156,
-            isFollowing: false,
-            images: []
-        }
-    ];
 
-    return(
-        <div className="max-w-2xl px-2 py-2 rounded-2xl">
-            {samplePosts.map(post => (
-                <PostCard 
-                    key={post.id}
-                    user={post.user}
-                    timestamp={post.timestamp}
-                    content={post.content}
-                    likes={post.likes}
-                    comments={post.comments}
-                    isFollowing={post.isFollowing}
-                    images={post.images}
-                    postId={post.id}
-                />
-            ))}
-        </div>
-    );
-}
 export default function ProfilePage(){
+    const {user} = useAuth();
+    const {username_id} = useParams();
+    const userId = username_id.split("_")[1];
+    const isOwnerProfile = userId === user?._id;
 
+    const [posts, setPosts] = useState ([]);
+
+    useEffect (() => {
+        fetch (`${import.meta.env.VITE_API_URL}/api/post/get_user_post?userId=${userId}`,
+            {
+                method : "GET",
+                credentials : "include",
+            }
+        )
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === "success"){
+                setPosts (data.data);
+                console.log ("Fetched user posts:", data.data);
+            }
+        })
+        .catch (err => {
+            console.error ("Error fetching user posts:", err);
+        });
+    }, [])
     return(
         <div className=" pt-20 px-4 ">
             <div className = " flex flex-col mx-auto w-[80%] ">
                 <ProfileHeader />
                 <div className = "grid grid-cols-1 md:grid-cols-[1fr_300px] gap-6 mt-8">
                     <div className = "w-full">
-                        <Posts></Posts>
+                        <Posts isOwnerProfile={isOwnerProfile} posts = {posts}></Posts>
                     </div>
                     <ShortcutToMap className = "top-[60%] right-[10%] w-[300px] static"></ShortcutToMap>
                 </div>

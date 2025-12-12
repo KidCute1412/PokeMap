@@ -5,15 +5,15 @@ import jwt from 'jsonwebtoken';
 import { User } from '../models/auth.model.js';
 
 export const verifyToken = async (req, res, next) => {
-    console.log ("Token cookies:", req.cookies);
+
     const token = req.cookies.accessToken;
-    console.log ("Verifying token:", token);
+
     if (!token) {
 
         return res.status(401).json({ success: false, message: 'No token provided' });
     }
     try {
-        console.log ("Decoding token...");
+
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
@@ -30,6 +30,28 @@ export const verifyToken = async (req, res, next) => {
         next();
     } catch (error) {
         return res.status(401).json({ success: false, message: 'Invalid token' });
+    }
+}
+
+export const justDecodeToken = async (req, res, next) => {
+
+    const token = req.cookies.accessToken;
+    if (!token) {
+        return next();
+    }
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        if (typeof decoded === 'string' || !decoded.id) {
+            return next();
+        }
+        const user = await User.findById(decoded.id).select('-password');
+        if (!user) {
+            return next();
+        }
+        req.user = user;
+        next();
+    } catch (error) {
+        return next();
     }
 }
 

@@ -55,7 +55,7 @@ export default function Profile(){
     };
 
     const handleViewProfile = () => {
-        navigate(`/profile/${speakingURL(user.username)}_${user._id}`);
+        navigate(`/profile/${user.username}_${user._id}`);
         setIsDropdownOpen(false);
     };
 
