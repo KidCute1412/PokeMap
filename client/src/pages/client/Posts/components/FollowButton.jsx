@@ -29,8 +29,8 @@ export default function FollowButton ({isFollowing, postId}) {
             onClick={handleFollow}
             className={`px-6 py-2 rounded-full font-medium transition-colors ${
                 following
-                    ? 'bg-green-600 text-white hover:bg-green-500 cursor-pointer'
-                    : 'bg-purple-600 text-white hover:bg-purple-700 cursor-pointer'
+                    ? 'bg-linear-to-r from-green-600 via-green-400 to-green-200 text-white hover:shadow-[0px_0px_5px] hover:scale-[105%] hover:shadow-green-200 animate__animated animate__rotateIn cursor-pointer'
+                    : 'bg-purple-600 text-white hover:bg-purple-500 cursor-pointer animate__animated animate__fadeIn'
             }`}
         >
             {following ? 'Following' : 'Follow'}

@@ -4,6 +4,7 @@ import FollowButton from "./FollowButton.jsx";
 import {Link} from "react-router-dom";
 import {cn} from "@/lib/utils.js"
 import { useState, useRef, useEffect } from "react";
+import MiniProfileAuthor from "./MiniProfileAuthor.jsx";
 export default function ContentPostCard ({data, handleImageClick, className}) {
     const [isExpanded, setIsExpanded] = useState(false);
     const [needsExpansion, setNeedsExpansion] = useState(false);
@@ -23,20 +24,24 @@ export default function ContentPostCard ({data, handleImageClick, className}) {
             {/* Header with user info and follow button */}
             <div className={cn("flex justify-between mb-4", className)}>
                 <div className="flex items-center space-x-3">
-                    <Link to = {data.owner_id ? `/profile/${data.username}_${data.owner_id}` : "#"} className="relative">
-                        <img 
-                            src={data.avatar || ""} 
-                            alt={data.username || "User Avatar"}
-                            className="w-16 h-16 rounded-full border-4 object-cover border-blue-400 hover:scale-105 hover:shadow-[0px_5px_10px] hover:shadow-blue-500 cursor-pointer transition-transform duration-300  "
-                        />
-                        <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-                            <span className="text-white text-xs">✦</span>
-                        </div>
-                    </Link>
+                    <MiniProfileAuthor userId = {data.owner_id} username = {data.username}>
+                        <Link to = {data.owner_id ? `/profile/${data.username}_${data.owner_id}` : "#"} className="relative" onClick = {(e) => e.stopPropagation()}>
+                            <img 
+                                src={data.avatar || ""} 
+                                alt={data.username || "User Avatar"}
+                                className="w-16 h-16 rounded-full border-4 object-cover border-blue-400 hover:scale-105 hover:shadow-[0px_5px_10px] hover:shadow-blue-500 cursor-pointer transition-transform duration-300  "
+                            />
+                            <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                                <span className="text-white text-xs">✦</span>
+                            </div>
+                        </Link>
+
+                    </MiniProfileAuthor>
                     <div>
                         <h3 className="text-white text-xl font-semibold">{data.username}</h3>
                         <p className="text-gray-400 text-sm">{data.createdAt ? new Date (data.createdAt).toLocaleString() : ""}</p>
                     </div>
+                    
                 </div>
                 {/* Follow button */}
                 <FollowButton isFollowing = {data.isFollowing} postId = {data._id}></FollowButton>
