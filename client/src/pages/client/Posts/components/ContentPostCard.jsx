@@ -6,7 +6,7 @@ import {cn} from "@/lib/utils.js"
 import { useState, useRef, useEffect } from "react";
 import MiniProfileAuthor from "./MiniProfileAuthor.jsx";
 import { Edit } from "lucide-react";
-export default function ContentPostCard ({data, handleImageClick, isOwnerProfile, className, onEditClick}) {
+export default function ContentPostCard ({data, setData, handleImageClick, isOwnerProfile, className, onEditClick}) {
     const [isExpanded, setIsExpanded] = useState(false);
     const [needsExpansion, setNeedsExpansion] = useState(false);
     const contentRef = useRef(null);
@@ -57,7 +57,8 @@ export default function ContentPostCard ({data, handleImageClick, isOwnerProfile
                 </div>
                 {/* Follow button and Edit button */}
                 <div className="flex items-center space-x-2">
-                    <FollowButton isFollowing = {data.isFollowing} postId = {data._id}></FollowButton>
+                    <FollowButton isFollowing = {data.isFollowing} setIsFollowing = {setData}
+                     postId = {data._id}></FollowButton>
                     {isOwnerProfile && (
                         <button
                             onClick={(e) => {
@@ -127,7 +128,7 @@ export default function ContentPostCard ({data, handleImageClick, isOwnerProfile
             <div className="flex items-center space-x-8">
 
                 {/* Likes */}
-                <LikeButton isLiked = {data.isLiked} likes = {data.likes} postId = {data._id}></LikeButton>
+                <LikeButton isLiked = {data.isLiked} likes = {data.likes} setData = {setData} postId = {data._id}></LikeButton>
 
 
                 {/* Comments */}

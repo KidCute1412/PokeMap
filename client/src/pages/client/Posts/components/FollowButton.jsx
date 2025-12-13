@@ -1,7 +1,7 @@
 import { useState} from "react";
 import { toast  }    from "sonner";
-export default function FollowButton ({isFollowing, postId}) {
-    const [following, setFollowing] = useState(isFollowing || false);
+export default function FollowButton ({isFollowing, setIsFollowing, postId}) {
+  
     const handleFollow = (e) => {
         e.stopPropagation();
 
@@ -18,7 +18,8 @@ export default function FollowButton ({isFollowing, postId}) {
             return res.json();
         })
         .then (data=> {
-            setFollowing (!following);
+
+            setIsFollowing (prev => ({...prev, isFollowing: !isFollowing}))
         })
         .catch (err => {
             toast.error (err.message || "Error following/unfollowing user");
@@ -29,12 +30,12 @@ export default function FollowButton ({isFollowing, postId}) {
         <button
             onClick={handleFollow}
             className={`px-6 py-2 h-full rounded-full font-medium transition-colors ${
-                following
+                isFollowing
                     ? 'bg-linear-to-r from-green-600 via-green-400 to-green-200 text-white hover:shadow-[0px_0px_5px] hover:scale-[105%] hover:shadow-green-200 animate__animated animate__rotateIn cursor-pointer'
                     : 'bg-purple-600 text-white hover:bg-purple-500 cursor-pointer animate__animated animate__fadeIn'
             }`}
         >
-            {following ? 'Following' : 'Follow'}
+            {isFollowing ? 'Following' : 'Follow'}
         </button>
     </>);
 }
