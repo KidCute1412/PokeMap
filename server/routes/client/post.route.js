@@ -11,7 +11,11 @@ route.patch("/edit", verifyToken, upload.array("images", 10), postController.edi
 route.post("/home", justDecodeToken, postController.getPostsInHome); // done
 route.get("/get_user_post", justDecodeToken, postController.getUserPosts); // query userId  // done
 route.post("/:postId/like", verifyToken, postController.likePost); // done
-route.post("/:postId/comment", postController.commentOnPost);
+
+//Comment routes
+route.get("/:postId/comments", postController.getPostComments);
+route.get("/comments/:commentId/replies", postController.getCommentReplies);
+
 route.delete("/:postId", postController.deletePost);
 route.post("/:postId/follow", verifyToken, postController.followUserFromPost); // done (remove author follow himself later)
 

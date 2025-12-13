@@ -127,7 +127,6 @@ export default function ContentPostCard ({data, handleImageClick, isOwnerProfile
             <div className="flex items-center space-x-8">
 
                 {/* Likes */}
-                {console.log ("Like status", data.isLiked, data.likes)}
                 <LikeButton isLiked = {data.isLiked} likes = {data.likes} postId = {data._id}></LikeButton>
 
 

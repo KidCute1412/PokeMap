@@ -1,6 +1,7 @@
 import uploadToCloudinary from "../../config/cloudinary.config.js";
 import fs from 'fs';
 import * as postService from "../../services/post.service.js";
+import * as commentService from "../../services/comment.service.js";
 
 
 // Example post controller functions
@@ -21,8 +22,6 @@ export const createPost = async (req, res) => {
         // Alternative: Use for...of loop instead of Promise.all + map
         for (const image of images) {
             const result = await uploadToCloudinary(image.path, "posts");
-            console.log("Uploaded image URL:", result.secure_url);
-            // Delete the local file after upload
             fs.unlinkSync(image.path);
             imageUrls.push(result.secure_url);
         }
@@ -93,10 +92,8 @@ export const getPostsInHome = async (req, res) => {
 };
 
 export const getUserPosts = async (req, res) => {
-    console.log ("Fetching posts for user ID:", req.query.userId);
     const viewer = req.user || null;
     const results = await postService.getUserPosts ({userId : req.query.userId, viewer : viewer});
-    console.log ("User posts fetched:", results);
     res.json ({
         status : "success",
         message : "User posts fetched successfully",
@@ -110,10 +107,57 @@ export const likePost = async (req, res) => {
     res.json({ message: "Post liked successfully" });
 }
 
-export const commentOnPost = (req, res) => {
-    // Your logic here
-    res.json({ message: "Comment on post" });
-}
+export const getPostComments = async (req, res) => {
+    try {
+        const postId = req.params.postId;
+        const page = req.query.page || 1;
+        const limit = req.query.limit || 10;
+
+        const result = await commentService.getPostComments({
+            postId,
+            page: parseInt(page),
+            limit: parseInt(limit)
+        });
+
+        res.json({
+            status: "success",
+            message: "Comments fetched successfully",
+            data: result.data,
+            pagination: result.pagination
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: "error",
+            message: error.message
+        });
+    }
+};
+
+export const getCommentReplies = async (req, res) => {
+    try {
+        const commentId = req.params.commentId;
+        const page = req.query.page || 1;
+        const limit = req.query.limit || 5;
+
+        const result = await commentService.getCommentReplies({
+            commentId,
+            page: parseInt(page),
+            limit: parseInt(limit)
+        });
+
+        res.json({
+            status: "success",
+            message: "Replies fetched successfully",
+            data: result.data,
+            pagination: result.pagination
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: "error",
+            message: error.message
+        });
+    }
+};
 
 export const deletePost = (req, res) => {
     // Your logic here
@@ -121,7 +165,6 @@ export const deletePost = (req, res) => {
 }
 
 export const followUserFromPost = async (req, res) => {
-    // Your logic here
     const postId = req.params.postId;
     const userId = req.user._id;
     const result = await postService.followUserFromPost ({postId: postId, userId: userId});
@@ -130,6 +173,3 @@ export const followUserFromPost = async (req, res) => {
     }
     res.json({ success: true, message: "User followed successfully" });
 }
-
-
-// Add more controller functions as needed

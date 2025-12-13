@@ -8,8 +8,6 @@ cloudinary.v2.config ({
     api_secret: process.env.CLOUDINARY_API_SECRET
 })
 
-
-
 // Multer configuration for file uploads
 const tempDir = path.join('.', 'tempUploads');
 if (!fs.existsSync(tempDir)){
