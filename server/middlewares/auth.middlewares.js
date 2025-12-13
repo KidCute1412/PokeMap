@@ -10,7 +10,7 @@ export const verifyToken = async (req, res, next) => {
 
     if (!token) {
 
-        return res.status(401).json({ success: false, message: 'No token provided' });
+        return res.status(401).json({ success: false, message: 'Need Login' });
     }
     try {
 
@@ -19,7 +19,7 @@ export const verifyToken = async (req, res, next) => {
 
         // Ensure decoded is an object with id property
         if (typeof decoded === 'string' || !decoded.id) {
-            return res.status(401).json({ success: false, message: 'Invalid token payload' });
+            return res.status(401).json({ success: false, message: 'Invalid verification' });
         }
 
         const user = await User.findById(decoded.id).select('-password');

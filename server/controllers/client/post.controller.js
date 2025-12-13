@@ -125,10 +125,10 @@ export const followUserFromPost = async (req, res) => {
     const postId = req.params.postId;
     const userId = req.user._id;
     const result = await postService.followUserFromPost ({postId: postId, userId: userId});
-    res.json ({
-        status : "success",
-        message : "Follow/unfollow action completed successfully",
-    });
+    if (result.status === "false") {
+        return  res.status(400).json({ success: false, message: result.message });
+    }
+    res.json({ success: true, message: "User followed successfully" });
 }
 
 
