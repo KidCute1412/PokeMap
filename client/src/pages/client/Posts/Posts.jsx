@@ -2,9 +2,8 @@ import PostCard from "@/pages/client/Posts/components/PostCard.jsx";
 import CreatePostModal from "./components/CreatePostModal";
 import {useState, memo} from "react";
 
-const Posts = memo(function Posts({isOwnerProfile = false, posts = []}) {
+const Posts = memo(function Posts({isOwnerProfile = false, posts = [], setPosts}) {
     const [openCreatePostModal, setOpenCreatePostModal] = useState(false);
-
 
     return(
         <div className="max-w-full px-2 py-2 rounded-2xl">
@@ -31,7 +30,7 @@ const Posts = memo(function Posts({isOwnerProfile = false, posts = []}) {
 
             {openCreatePostModal && (
                 <div className="fixed inset-0 flex items-center justify-center z-50">
-                    <CreatePostModal onClose={() => setOpenCreatePostModal(false)} />
+                    <CreatePostModal setData = {setPosts}  onClose={() => setOpenCreatePostModal(false)} />
                 </div>
             )}
         </div>

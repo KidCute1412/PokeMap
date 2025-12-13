@@ -2,7 +2,7 @@ import uploadToCloudinary from "../../config/cloudinary.config.js";
 import fs from 'fs';
 import * as postService from "../../services/post.service.js";
 import * as commentService from "../../services/comment.service.js";
-
+import moongoose from "mongoose";
 
 // Example post controller functions
 export const createPost = async (req, res) => {
@@ -28,16 +28,20 @@ export const createPost = async (req, res) => {
 
     }
 
-    await postService.createPost ({
+    const newPost = await postService.createPost ({
         content: content,
         images: imageUrls,
         user: userId
     })
 
+    const newPostId = newPost._id;
 
+    const newData = await postService.getUserPostById ({postId : newPostId, userId : userId, viewer : req.user || null});
+    
     res.json({
         status: "success",
-        message: "Post created successfully"
+        message: "Post created successfully",
+        data : newData[0]
     });
 };
 
@@ -72,9 +76,11 @@ export const editPost = async (req, res) => {
         content: content,
         images: allImages,
     })
+    const newData = await postService.getPostById (postId);
     res.json({
         status: "success",
-        message: "Post edited successfully"
+        message: "Post edited successfully",
+        data : newData
     });
 }
 

@@ -46,7 +46,7 @@ export default function ProfilePage(){
                 <ProfileHeader />
                 <div className = "grid grid-cols-1 md:grid-cols-[1fr_300px] gap-6 mt-8">
                     <div className = "w-full">
-                        <Posts isOwnerProfile={isOwnerProfile} posts = {memoizedPosts}></Posts>
+                        <Posts isOwnerProfile={isOwnerProfile} posts = {memoizedPosts} setPosts = {setPosts}></Posts>
                     </div>
                     <ShortcutToMap className = "top-[60%] right-[10%] w-[300px] static"></ShortcutToMap>
                 </div>

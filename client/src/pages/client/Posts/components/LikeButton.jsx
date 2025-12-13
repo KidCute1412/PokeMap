@@ -1,12 +1,10 @@
 import activeStarIcon from "@/assets/icons/active_star.png";
 import inactiveStarIcon from "@/assets/icons/inactive_star.png";
-import {useState} from "react";
+
 import {toast} from "sonner";
 
-export default function LikeButton ({isLiked, likes, postId}) {
+export default function LikeButton ({isLiked, likes, setData, postId}) {
 
-    const [liked, setLiked] = useState(isLiked || false);
-    const [likeCount, setLikeCount] = useState(likes || 0);
 
 
     const handleLikeClick = (e) => {
@@ -25,8 +23,11 @@ export default function LikeButton ({isLiked, likes, postId}) {
         })
         .then (data => {
             console.log(data);
-            setLiked (!liked);
-            setLikeCount (liked ? likeCount - 1 : likeCount + 1);
+            setData (prevData => ({
+                ...prevData,
+                isLiked: !isLiked,
+                likes: isLiked ? prevData.likes - 1 : prevData.likes + 1
+            }));
         })
         .catch (err => {
             toast.error (err.message || "Error liking/unliking post");
@@ -38,11 +39,11 @@ export default function LikeButton ({isLiked, likes, postId}) {
         {/* Likes */}
             <div className="flex items-center space-x-2" onClick={handleLikeClick}>
                 <div className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center cursor-pointer">
-                    <span className={`text-white text-xl p-1 ${liked ? "bg-red-600 shadow-[0px_0px_5px] shadow-red-100" : ""} rounded-full transition-all duration-300`}>
-                        <img src={liked ? activeStarIcon : inactiveStarIcon} alt="like" />
+                    <span className={`text-white text-xl p-1 ${isLiked ? "bg-red-600 shadow-[0px_0px_5px] shadow-red-100" : ""} rounded-full transition-all duration-300`}>
+                        <img src={isLiked ? activeStarIcon : inactiveStarIcon} alt="like" />
                     </span>
                 </div>
-                <span className="text-white font-semibold">{likeCount}</span>
+                <span className="text-white font-semibold">{likes}</span>
             </div>
         </>
     );

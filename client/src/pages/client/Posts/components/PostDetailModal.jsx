@@ -3,7 +3,7 @@ import { X} from "lucide-react";
 import ContentPostCard from "./ContentPostCard.jsx";
 import Comment from "./Comment.jsx";
 
-export default function PostDetailModal({ data, onClose, onImageClick }) {
+export default function PostDetailModal({ data, setData, onClose, onImageClick }) {
 
 
 
@@ -24,7 +24,7 @@ export default function PostDetailModal({ data, onClose, onImageClick }) {
                 <div className="flex max-h-[calc(90vh-80px)]">
                     {/* Left side - Post content */}
                     <div className="flex-1 p-6 overflow-y-auto scrollbar-hide">
-                        <ContentPostCard data={data} handleImageClick={onImageClick}/>
+                        <ContentPostCard data={data} setData = {setData} handleImageClick={onImageClick}/>
                     </div>
                     {/* Right side - Comments */}
                     <Comment data={data} />

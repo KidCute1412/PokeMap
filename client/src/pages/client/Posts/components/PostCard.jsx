@@ -12,7 +12,7 @@ import useIntersectionObserver from "@/hooks/useIntersectionObserver.jsx";
 
 
 const PostCard = memo (function PostCard({data, isOwnerProfile = false}) {
-
+    const [post, setPost] = useState (data);
     const [showPostDetail, setShowPostDetail] = useState(false);
     const [showImageDetail, setShowImageDetail] = useState(false); 
     const [showEditModal, setShowEditModal] = useState(false);    
@@ -37,14 +37,15 @@ const PostCard = memo (function PostCard({data, isOwnerProfile = false}) {
             <div ref = {imageObserver.ref} className={`bg-gray-800/70 rounded-2xl p-6 mb-6 shadow-lg border border-gray-700 cursor-pointer hover:bg-gray-750 transition-colors
                  ${imageObserver.hasIntersected ? "animate__animated animate__fadeInUp" : ""}`} onClick={handlePostClick}>
                 {imageObserver.hasIntersected && (
-                    <ContentPostCard data={data} handleImageClick={handleImageClick} isOwnerProfile = {isOwnerProfile} onEditClick={handleEditClick} />
+                    <ContentPostCard data={post} setData = {setPost} handleImageClick={handleImageClick} isOwnerProfile = {isOwnerProfile} onEditClick={handleEditClick} />
                 )}
             </div>      
 
             {/* Post Detail Modal */}
             {showPostDetail && (
                 <PostDetailModal
-                    data = {data}   
+                    data = {post}   
+                    setData = {setPost}
                     onClose={() => setShowPostDetail(false)}
                     onImageClick={handleImageClick}
                 />
@@ -53,7 +54,7 @@ const PostCard = memo (function PostCard({data, isOwnerProfile = false}) {
             {/* Image Detail Modal */}
             {showImageDetail && (
                 <ImageDetailModal
-                    images={data.images}
+                    images={post.images}
                     currentIndex={selectedImageIndex}
                     onClose={() => setShowImageDetail(false)}
                 />
@@ -62,7 +63,8 @@ const PostCard = memo (function PostCard({data, isOwnerProfile = false}) {
             {/* Edit Modal */}
             {showEditModal && (
                 <PostEditModal
-                    postData={data}
+                    postData={post}
+                    setPost={setPost}
                     onClose={() => setShowEditModal(false)}
                 />
             )}

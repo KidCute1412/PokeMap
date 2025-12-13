@@ -6,12 +6,14 @@ import { useState, useEffect } from 'react';
 import JustValidate from 'just-validate';
 import { toast } from "sonner";
 
-export default function EditPostModal({postData, onClose }) {
+export default function EditPostModal({postData, setPost, onClose }) {
     const {user} = useAuth();
     const [oldImages, setOldImages] = useState(postData.images || []);
     const [images, setImages] = useState([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     useEffect (() => {
+        document.getElementById("editPostContent").value = postData.content;
+
         const validate = new JustValidate ("#createPostForm");
         validate.addField("#editPostContent", [
             {
@@ -55,16 +57,17 @@ export default function EditPostModal({postData, onClose }) {
         })
         .then (res => {
             if (!res.ok){
-                throw new Error ("Failed to create post");
+                throw new Error ("Failed to edit post");
             }
             return res.json();
         })
         .then (data => {
-            toast.success (data.message || "Post created successfully");
+            toast.success (data.message || "Post edited successfully");
+            setPost (prev => ({...prev, images: data.data.images, content: data.data.content, updatedAt: data.data.updatedAt}));
             onClose ();
         })
         .catch (err => {
-            toast.error (err.message || "Error creating post");
+            toast.error (err.message || "Error editing post");
         })
         .finally (() =>{
             setIsSubmitting (false);
