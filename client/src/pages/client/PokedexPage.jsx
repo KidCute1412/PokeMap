@@ -152,7 +152,7 @@ export default function PokedexPage() {
         )}
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-blue-900/20 to-transparent pointer-events-none z-0"></div>
+      <div className="fixed inset-0 h-full bg-gradient-to-t from-blue-900/50 via-transparent to-transparent pointer-events-none z-0"></div>
     </div>
   );
 }
