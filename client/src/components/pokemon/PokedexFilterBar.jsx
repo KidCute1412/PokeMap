@@ -1,6 +1,5 @@
-// components/PokedexFilterBar.jsx
 import React, { useState } from 'react';
-import { Search, Filter} from 'lucide-react'; // Cần cài lucide-react
+import { Search, Filter} from 'lucide-react'; 
 import { TYPE_COLORS } from './constants.js';
 
 const PokedexFilterBar = ({ 
@@ -9,12 +8,11 @@ const PokedexFilterBar = ({
   selectedTypes, 
   toggleType 
 }) => {
-  const [isExpanded, setIsExpanded] = useState(true); // Mặc định mở như trong hình
+  const [isExpanded, setIsExpanded] = useState(true); 
   const allTypes = Object.keys(TYPE_COLORS);
 
   return (
     <div className="w-full space-y-4 mb-8">
-      {/* Top Bar: Search + Filter Toggle */}
       <div className="flex gap-4">
         <div className="flex-1 relative">
           <input
@@ -36,11 +34,9 @@ const PokedexFilterBar = ({
         </button>
       </div>
 
-      {/* Expanded Filter Area */}
       {isExpanded && (
         <div className="bg-slate-800/50 p-6 rounded-3xl border border-slate-700 backdrop-blur-md animate-in fade-in slide-in-from-top-4">
           
-          {/* Types Section */}
           <div className="mb-4">
             <h4 className="text-white font-bold mb-3 text-lg">Type</h4>
             <div className="flex flex-wrap gap-2">
@@ -64,7 +60,6 @@ const PokedexFilterBar = ({
             </div>
           </div>
 
-          {/* Category Section (Demo UI theo hình) */}
           <div>
             <h4 className="text-white font-bold mb-3 text-lg">Category</h4>
             <div className="flex gap-6">

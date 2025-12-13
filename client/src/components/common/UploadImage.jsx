@@ -154,24 +154,24 @@ export default function UploadImage({
             <div>
               {isDragActive && !isDragReject ? (
                 <p className="text-blue-600 font-semibold">
-                  Thả hình ảnh vào đây!
+                  Drop the images here...
                 </p>
               ) : isDragReject ? (
                 <p className="text-red-600 font-semibold">
-                  Chỉ chấp nhận file hình ảnh!
+                  Only image files are accepted
                 </p>
               ) : images.length >= maxFiles ? (
                 <p className="text-gray-500">
-                  Đã đạt giới hạn {maxFiles} hình ảnh
+                  Reach limit {maxFiles} images
                 </p>
               ) : (
                 <>
                   <p className="text-gray-600 font-semibold mb-2">
-                    Kéo thả hình ảnh vào đây hoặc{" "}
-                    <span className="text-blue-500">nhấn để chọn</span>
+                    drop image to {" "}
+                    <span className="text-blue-500">click to choose</span>
                   </p>
                   <p className="text-sm text-gray-400">
-                    Hỗ trợ: JPG, PNG, GIF, WEBP (Tối đa {maxFiles} hình)
+                    Support jpeg, jpg, png, gif, webp. Max {maxFiles} images.
                   </p>
                 </>
               )}
@@ -188,8 +188,8 @@ export default function UploadImage({
                 <ImageIcon className="w-4 h-4 mr-2 text-blue-500" />
                 <span className="font-medium">{images.length}</span>
                 <span className="mx-1">/</span>
-                <span>{maxFiles} hình ảnh</span>
-                <span className="ml-2 text-gray-400">• Click để thêm hình</span>
+                <span>{maxFiles} images</span>
+                <span className="ml-2 text-gray-400">• Click to add images</span>
               </div>
 
               <button
@@ -199,7 +199,7 @@ export default function UploadImage({
                   e.stopPropagation();
                   if (
                     window.confirm(
-                      `Bạn có chắc muốn xóa tất cả ${images.length} hình ảnh?`
+                      `Are you sure to delete ${images.length} images?`
                     )
                   ) {
                     onImagesChange([]);
@@ -208,7 +208,7 @@ export default function UploadImage({
                 className="flex items-center cursor-pointer hover:scale-105  space-x-1 px-2 py-1 bg-red-50 hover:bg-red-100 text-red-600 rounded text-xs transition-all duration-200"
               >
                 <Trash2 className="w-3 h-3" />
-                <span>Xóa tất cả</span>
+                <span>Delete all</span>
               </button>
             </div>
 
@@ -278,7 +278,7 @@ export default function UploadImage({
                     {index === 0 && (
                       <div className="absolute bottom-1 left-1">
                         <span className="bg-green-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full shadow-sm">
-                          Chính
+                          Main
                         </span>
                       </div>
                     )}
@@ -299,7 +299,7 @@ export default function UploadImage({
                 <div className="aspect-square rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:border-blue-400 hover:bg-blue-50 cursor-pointer transition-all duration-200 flex items-center justify-center">
                   <div className="text-center">
                     <Upload className="w-6 h-6 mx-auto text-gray-400 mb-1" />
-                    <p className="text-xs text-gray-500">Thêm hình</p>
+                    <p className="text-xs text-gray-500">Add Image</p>
                   </div>
                 </div>
               )}
@@ -311,18 +311,18 @@ export default function UploadImage({
       {/* Image Preview Modal */}
       {imageModalOpen && selectedImage && (
         <div
-          className="fixed inset-0 z-[10001] flex items-center justify-center p-4 bg-black/50 bg-opacity-80 backdrop-blur-sm animate-fadeIn"
+          className="fixed inset-0 z-[10001] flex items-center justify-center p-4 bg-white/10 backdrop-blur-sm"
           onClick={() => setImageModalOpen(false)}
         >
           <div
-            className="relative max-w-6xl max-h-full bg-white rounded-xl shadow-2xl overflow-hidden animate-scaleIn"
+            className="relative max-w-6xl max-h-full bg-white rounded-xl shadow-2xl overflow-hidden animate__animated animate__zoomIn"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
             <div className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-500 to-white text-white">
               <h3 className="text-lg font-semibold flex items-center">
                 <Eye className="w-5 h-5 mr-2" />
-                Xem trước hình ảnh
+                Preview Image
               </h3>
               <button
                 onClick={() => setImageModalOpen(false)}

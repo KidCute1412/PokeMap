@@ -41,6 +41,43 @@ export const createPost = async (req, res) => {
     });
 };
 
+export const editPost = async (req, res) => {
+    const content = req.body.editPostContent;
+    const userId = req.body.userId;
+    const postId = req.body.postId;
+    const isOwner = userId == req.user._id;
+    const images = req.files;
+    const oldImages = req.body.oldImages ? JSON.parse (req.body.oldImages) : [];
+
+    if (!content || !isOwner || !postId) {
+        return res.status(400).json({ message: "Post content, user ID, and post ID are required" });
+    }
+
+    let imageUrls = [];
+    if (images && images.length > 0) {
+        for (const image of images) {
+            const result = await uploadToCloudinary(image.path, "posts");
+            console.log("Uploaded image URL:", result.secure_url);
+            // Delete the local file after upload
+            fs.unlinkSync(image.path);
+            imageUrls.push(result.secure_url);
+        }
+    }
+
+    // Combine old images with newly uploaded images
+    const allImages = [...oldImages, ...imageUrls];
+
+    await postService.editPost ({
+        postId: postId,
+        content: content,
+        images: allImages,
+    })
+    res.json({
+        status: "success",
+        message: "Post edited successfully"
+    });
+}
+
 export const getPostsInHome = async (req, res) => {
     const viewer = req.user || null;
     const limit = req.body.limit || 5;

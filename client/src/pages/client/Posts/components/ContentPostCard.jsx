@@ -5,7 +5,8 @@ import {Link} from "react-router-dom";
 import {cn} from "@/lib/utils.js"
 import { useState, useRef, useEffect } from "react";
 import MiniProfileAuthor from "./MiniProfileAuthor.jsx";
-export default function ContentPostCard ({data, handleImageClick, className}) {
+import { Edit } from "lucide-react";
+export default function ContentPostCard ({data, handleImageClick, isOwnerProfile, className, onEditClick}) {
     const [isExpanded, setIsExpanded] = useState(false);
     const [needsExpansion, setNeedsExpansion] = useState(false);
     const contentRef = useRef(null);
@@ -44,11 +45,32 @@ export default function ContentPostCard ({data, handleImageClick, className}) {
                     <div>
                         <h3 className="text-white text-xl font-semibold">{data.username}</h3>
                         <p className="text-gray-400 text-sm">{data.createdAt ? new Date (data.createdAt).toLocaleString() : ""}</p>
+                        {/* updatedAt if != createdAt */}
+                        {data.updatedAt && data.updatedAt !== data.createdAt && (
+                            
+                            <span className="text-gray-400 text-sm">edited: {new Date (data.updatedAt).toLocaleString()}</span>
+                            
+                        )}
                     </div>
                     
+                    
                 </div>
-                {/* Follow button */}
-                <FollowButton isFollowing = {data.isFollowing} postId = {data._id}></FollowButton>
+                {/* Follow button and Edit button */}
+                <div className="flex items-center space-x-2">
+                    <FollowButton isFollowing = {data.isFollowing} postId = {data._id}></FollowButton>
+                    {isOwnerProfile && (
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onEditClick();
+                            }}
+                            className="p-2 bg-gray-700 hover:bg-gray-600 rounded-full text-white transition-colors duration-200"
+                            title="Edit post"
+                        >
+                            <Edit className="w-4 h-4" />
+                        </button>
+                    )}
+                </div>
                 
             </div>
 
