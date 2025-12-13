@@ -66,7 +66,6 @@ export const getTotalPages = async (req, res) => {
 
 export const warnPost = async (req, res) => {   
     const { postId } = req.params;
-    console.log("Warning post ID:", postId);
     const { warningType, description, warnedBy } = req.body;
     
     try {

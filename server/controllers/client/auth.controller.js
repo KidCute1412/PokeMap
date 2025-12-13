@@ -89,7 +89,6 @@ export const resendSignupOTP = async (req, res) => {
 export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
-        console.log('Login request body:', req.body);
         const result = await loginService(email, password, 'user');
 
         // Create JWT token

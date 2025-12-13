@@ -16,7 +16,13 @@ const app = express();
 const PORT = 10000;
 
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+    cors: {
+        origin: ['http://localhost:3800'],
+        methods: ['GET', 'POST'],
+        credentials: true
+    }
+});
 initSocket(io);
 
 connectDatabase();
@@ -37,6 +43,6 @@ app.use(express.json());
 app.use("/api", clientRouter);
 app.use("/api/admin", AdminRouter);
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

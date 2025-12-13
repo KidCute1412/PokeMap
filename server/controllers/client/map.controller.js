@@ -5,16 +5,13 @@ import { User } from "../../models/user.model.js";
 export const getMapState = async (req, res) => {
     try {
         const userId = req.user._id || req.user.id;
-        console.log('Getting map state for user:', userId);
 
         // Get user's selected Pokemon
         const user = await User.findById(userId);
         const selectedPokemon = user?.selectedPokemon || [];
-        console.log('Selected Pokemon count:', selectedPokemon.length);
 
         // Get all markers for this user
         const mapPins = await MapPin.find({ userID: userId });
-        console.log('Found markers:', mapPins.length);
 
         // Convert MapPin documents to marker format
         const markers = mapPins.map(pin => ({
@@ -51,10 +48,6 @@ export const saveMapState = async (req, res) => {
         const userId = req.user._id || req.user.id;
         const { selectedPokemon, markers } = req.body;
 
-        console.log('Saving map state for user:', userId);
-        console.log('Selected Pokemon:', selectedPokemon?.length || 0);
-        console.log('Markers:', markers?.length || 0);
-
         // Validate input
         if (!Array.isArray(selectedPokemon) || !Array.isArray(markers)) {
             return res.status(400).json({
@@ -69,11 +62,9 @@ export const saveMapState = async (req, res) => {
             { selectedPokemon: selectedPokemon || [] },
             { new: true }
         );
-        console.log('User updated:', updatedUser ? 'Success' : 'Failed');
 
         // Delete all existing markers for this user
         const deleteResult = await MapPin.deleteMany({ userID: userId });
-        console.log('Deleted existing markers:', deleteResult.deletedCount);
 
         // Create new markers
         if (markers && markers.length > 0) {
@@ -90,7 +81,6 @@ export const saveMapState = async (req, res) => {
             }));
 
             const insertResult = await MapPin.insertMany(mapPinsToInsert);
-            console.log('Inserted markers:', insertResult.length);
         }
 
         res.status(200).json({
