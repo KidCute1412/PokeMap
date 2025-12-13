@@ -421,13 +421,13 @@ export const followUserFromPost = async ({postId, userId}) => {
     // is UserId owner of the post
     const post = await Post.findById(postId);
     if (!post) {
-        throw new Error('Post not found');
+        return { status : "false",message: 'Post not found' };
     }
     const postOwnerId = post.user.toString();
 
-    // if (postOwnerId === userId) {
-    //     throw new Error('User cannot follow themselves');
-    // }
+    if (postOwnerId == userId) {
+        return {status : "false", message: "Cannot follow yourself" };
+    }
 
     const existingFollow = await Follow.findOne({follower: userId, following: postOwnerId});
     if (existingFollow) {

@@ -11,10 +11,11 @@ export default function FollowButton ({isFollowing, postId}) {
         })
         .then (res => {
             if (!res.ok) {
-                res.json().then (data=> {
+                return res.json().then (data=> {
                     throw new Error (data.message || "Failed to follow/unfollow user");
                 })
             }
+            return res.json();
         })
         .then (data=> {
             setFollowing (!following);

@@ -17,7 +17,7 @@ export default function LikeButton ({isLiked, likes, postId}) {
         })
         .then (res => {
             if (!res.ok) {
-                res.json().then (data=> {
+                return res.json().then (data=> {
                     throw new Error (data.message || "Failed to like/unlike post");
                 })
             }
