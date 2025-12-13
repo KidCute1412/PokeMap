@@ -35,7 +35,7 @@ export default function ProfilePage(){
         .catch (err => {
             console.error ("Error fetching user posts:", err);
         });
-    }, [])
+    }, [username_id])
     
     // Memoize posts to prevent unnecessary re-renders
     const memoizedPosts = useMemo(() => posts, [posts.length, posts.map(p => p._id).join(',')]);

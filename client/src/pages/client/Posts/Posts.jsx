@@ -25,6 +25,7 @@ const Posts = memo(function Posts({isOwnerProfile = false, posts = []}) {
                 <PostCard
                     key={post._id}
                     data = {post}
+                    isOwnerProfile={isOwnerProfile}
                 />
             ))}
 

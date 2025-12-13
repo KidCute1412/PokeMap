@@ -185,6 +185,13 @@ export const createPost = async ({content, images, user}) => {
     });
     return newPost; 
 }
+export const editPost = async ({postId, content, images}) => {
+    return await Post.findByIdAndUpdate(postId, {
+        content: content,
+        images: images
+    }, { new: true });
+}
+
 export const getPostsInHome = async ({viewer, limit, exclude_ids}) => {
 
     

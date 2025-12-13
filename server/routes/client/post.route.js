@@ -7,6 +7,7 @@ const route = express.Router ();
 
 
 route.post("/create", verifyToken, upload.array("images", 10), postController.createPost); // done
+route.patch("/edit", verifyToken, upload.array("images", 10), postController.editPost); // done
 route.post("/home", justDecodeToken, postController.getPostsInHome); // done
 route.get("/get_user_post", justDecodeToken, postController.getUserPosts); // query userId  // done
 route.post("/:postId/like", verifyToken, postController.likePost); // done
