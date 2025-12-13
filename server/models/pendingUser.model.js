@@ -4,7 +4,6 @@ const pendingUserSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
-        unique: true,
         lowercase: true
     },
     password: {
@@ -52,5 +51,8 @@ const pendingUserSchema = new mongoose.Schema({
     timestamps: true,
     strict: false
 });
+
+// Compound unique index: email + role combination must be unique
+pendingUserSchema.index({ email: 1, role: 1 }, { unique: true });
 
 export const PendingUser = mongoose.model('Pending_users', pendingUserSchema);
