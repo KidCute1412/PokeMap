@@ -28,16 +28,20 @@ export const createPost = async (req, res) => {
 
     }
 
-    await postService.createPost ({
+    const newPost = await postService.createPost ({
         content: content,
         images: imageUrls,
         user: userId
     })
 
+    const newPostId = newPost._id;
 
+    const newData = await postService.getUserPostById ({postId : newPostId, userId : userId, viewer : req.user || null});
+    
     res.json({
         status: "success",
-        message: "Post created successfully"
+        message: "Post created successfully",
+        data : newData[0]
     });
 };
 

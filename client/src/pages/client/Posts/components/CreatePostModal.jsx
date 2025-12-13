@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import JustValidate from 'just-validate';
 import {toast} from "sonner";
 
-export default function CreatePostModal({onClose }) {
+export default function CreatePostModal({onClose, setData }) {
     const {user} = useAuth();
     const [images, setImages] = useState([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -56,6 +56,7 @@ export default function CreatePostModal({onClose }) {
         })
         .then (data => {
             toast.success (data.message || "Post created successfully");
+            setData (prev => [data.data, ...prev]);
             onClose ();
         })
         .catch (err => {
