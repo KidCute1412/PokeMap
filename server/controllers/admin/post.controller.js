@@ -3,7 +3,7 @@ import * as postService from '../../services/post.service.js';
 export const getAllPosts = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 10;
+        const limit = parseInt(req.query.limit) || 5;
         const numberOfPosts = await postService.countPosts();
         const totalPages = Math.ceil(numberOfPosts / limit);
         const posts = await postService.getAllPosts({page: page, limit: limit});
@@ -11,14 +11,15 @@ export const getAllPosts = async (req, res) => {
             success: true,
             message: 'Posts retrieved successfully',
             data: posts,
-            numberOfPages: totalPages
+            numberOfPages: totalPages,
+            totalPost: numberOfPosts
         });
     } catch (error) {
         res.json({
             success: false,
             message: 'An error occurred while retrieving posts',
             error: error.message    
-        });
+        }); 
     }
 }
 
@@ -78,10 +79,27 @@ export const warnPost = async (req, res) => {
         }
 
         const post = await postService.warnPost(postId, warningType, description, warnedBy);
+        if (!post) {
+            return res.status(404).json({
+                success: false,
+                message: 'Post not found'
+            });
+        }
+        if (post.code === "FAILED"){
+            return res.status(400).json({
+                success: false,
+                message: post.message,
+                warning_counts: post.warning_counts,
+                isDeleted: post.isDeleted,
+                deletedAt: post.deletedAt
+            });
+        }
         res.json({
             success: true,
             message: post.message,
-            data: post.data
+            warning_counts: post.warning_counts,
+            isDeleted: post.isDeleted,
+            deletedAt: post.deletedAt
         });
     } catch (error) {
         res.status(400).json({
@@ -101,6 +119,31 @@ export const deletePost = async (req, res) => {
             res.json({
                 success: true,
                 message: 'Post deleted successfully',
+                deletedAt: post.deletedAt,
+            });
+        } else {
+            res.json({
+                success: false,
+                message: 'Post not found',
+            });
+        }
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: 'An error occurred while deleting the post',
+            error: error.message
+        });
+    }
+}
+
+export const recoverPost = async (req, res) => {
+    const { postId } = req.params;
+    try {
+        const post = await postService.recoverPost(postId);
+        if (post) {
+            res.json({
+                success: true,
+                message: 'Post recovered successfully',
                 data: post
             });
         } else {
@@ -112,7 +155,7 @@ export const deletePost = async (req, res) => {
     } catch (error) {
         res.status(400).json({
             success: false,
-            message: 'An error occurred while deleting the post',
+            message: 'An error occurred while recovering the post',
             error: error.message
         });
     }

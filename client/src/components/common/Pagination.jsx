@@ -92,7 +92,7 @@ function PaginationComponent ({numberOfPages, currentPage, controlPage}
             <Pagination>
             <PaginationContent>
                 <PaginationItem className = "">
-                <PaginationPrevious href = "#" onClick = {()=> {controlPage && controlPage(currentPage - 1)}}
+                <PaginationPrevious onClick = {()=> {controlPage && controlPage(currentPage - 1)}}
                     className = {`${currentPage - 1 === 0 ? "pointer-events-none text-gray-300": ""}`}/>
                 </PaginationItem>
                 {pageRange.map((items, index) => {
@@ -111,7 +111,7 @@ function PaginationComponent ({numberOfPages, currentPage, controlPage}
                     let element = (
                         <PaginationItem key={index}>
                             <PaginationLink 
-                                href="#" 
+                    
                                 onClick={() => controlPage && controlPage(pageNumber)}
                                 isActive={isCurrent}
                             >
@@ -137,7 +137,7 @@ function PaginationComponent ({numberOfPages, currentPage, controlPage}
 
                 })}
                 <PaginationItem>
-                <PaginationNext href="#" onClick = {()=> {controlPage && controlPage(currentPage + 1)}}
+                <PaginationNext onClick = {()=> {controlPage && controlPage(currentPage + 1)}}
                     className = {`${currentPage  === numberOfPages ? "pointer-events-none text-gray-300": ""}`}/>
                 </PaginationItem>
             </PaginationContent>

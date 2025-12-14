@@ -1,11 +1,10 @@
 import { useState, useEffect} from 'react';
-import { Eye, Trash2, Users, Search } from 'lucide-react';
+import {Users, Search } from 'lucide-react';
 import PaginationComponent from '@/components/common/Pagination';
-import UserDetailModal from '@/pages/admin/users/components/UserDetailModal';
-import DeleteConfirmModal from '@/pages/admin/users/components/UserDeleteModal';
 import { useSearchParams } from 'react-router-dom';
 import {toast} from "sonner";
 import Loading from '@/components/common/AdminLoading';
+import UserLine from '@/pages/admin/users/components/UserLine';
 // User Detail Modal Component
 
 
@@ -13,11 +12,9 @@ import Loading from '@/components/common/AdminLoading';
 
 
 
-export default function App() {
+export default function UserAdminPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [users, setUsers] = useState();
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [userToDelete, setUserToDelete] = useState(null);
   const [totalUsers, setTotalUsers] = useState(0);
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -31,13 +28,6 @@ export default function App() {
     setSearchParams({ page });
   }
 
-  const handleViewDetails = (user) => {
-    setSelectedUser(user);
-  };
-
-  const handleDeleteClick = (user) => {
-    setUserToDelete(user);
-  };
 
 
 
@@ -46,12 +36,21 @@ export default function App() {
     // List Users
     setIsLoading(true);
     const page = searchParams.get("page") || 1;
-    fetch(`http://localhost:10000/api/admin/user/listUsers?page=${page}&limit=5`)
-    .then (res => res.json())
-    .then (data => {
-      if (data.success){
-        setUsers (data.data);
+    fetch(`${import.meta.env.VITE_API_URL}/api/admin/user/listUsers?page=${page}&limit=5`,{
+      method: "GET",
+      credentials: "include"
+    })
+    .then (res => { 
+      if (!res.ok) {
+        return res.json().then (data => {
+          throw new Error (data.message || "Failed to fetch users");
+        })
       }
+      return res.json();
+    })
+    .then (data => {
+        setUsers (data.data);
+        setNumberOfPages (data.totalPages);
     })
     .catch (err => {
       console.error("Error fetching users:", err);
@@ -59,13 +58,17 @@ export default function App() {
     });
 
     // Total Users
-    fetch(`http://localhost:10000/api/admin/user/total-users`)
-    .then (res => res.json())
-    .then (data => {
-      if (data.success){
-        
-        setTotalUsers (data.data.totalUsers);
+    fetch(`${import.meta.env.VITE_API_URL}/api/admin/user/total-users`)
+    .then (res => {
+      if (!res.ok) {
+        return res.json().then (data => {
+          throw new Error (data.message || "Failed to fetch total users");
+        })
       }
+      return res.json();
+    })
+    .then (data => { 
+        setTotalUsers (data.data);
     })
     .catch (err => {
       console.error("Error fetching total users:", err);
@@ -75,184 +78,111 @@ export default function App() {
     setIsLoading(false);
   }, [searchParams]);
 
-  // Number of Pages
-  useEffect (()=> {
-    //  Number of Pages
-    setIsLoading(true);
-    fetch("http://localhost:10000/api/admin/user/total-pages?limit=5")
-    .then (res => res.json())
-    .then (data => {
-      if (data.success){
-        setNumberOfPages (data.data.totalPages);
-      }
-
-    })
-    .catch (err => {
-      console.error("Error fetching total user pages:", err);
-      toast.error("Failed to fetch total user pages");
-    });
-    setIsLoading(false);
-    setCurrentPage (Number(searchParams.get("page")) || 1);
-  }, [searchParams]);
-
-
-
-  
-  
-
-
-
 
 
 
   return (
-    isLoading ? <Loading></Loading> :<div className="min-h-screen p-4 md:p-8">
-      <div className="max-w-7xl mx-auto">
+    isLoading ? <Loading></Loading> : 
+    <div className="min-h-screen bg-slate-50 p-4 md:p-8">
+      <div className="max-w-7xl mx-auto overflow-x-auto">
+
         {/* Header */}
-       
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-12 h-12 bg-rose-400 rounded-lg flex items-center justify-center">
-              <Users className="w-6 h-6 text-white" />
+        <div className="mb-10">
+          <div className="flex items-center gap-4 mb-3">
+            <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+              <Users className="w-7 h-7 text-white" />
             </div>
             <div>
-              <h1 className="text-gray-500 text-3xl font-bold ">User Management Dashboard</h1>
+              <h1 className="text-slate-800 text-4xl font-bold tracking-tight">User Management</h1>
+              <p className="text-slate-600 text-lg mt-1 font-medium">Manage and monitor user accounts across the platform</p>
             </div>
           </div>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
               <div>
-                <p className=" text-gray-600 mb-1">Total Users</p>
-                <p className="text-green-500 font-bold text-2xl">{totalUsers}</p>
+                <p className="text-slate-500 text-sm font-semibold uppercase tracking-wide mb-2">Total Users</p>
+                <p className="text-slate-800 font-bold text-3xl">{totalUsers}</p>
+                <p className="text-emerald-600 text-sm font-medium mt-1">Active accounts</p>
               </div>
-              <div className="w-12 h-12 bg-rose-100 rounded-lg flex items-center justify-center">
-                <Users className="w-6 h-6 text-rose-600" />
+              <div className="w-14 h-14 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-xl flex items-center justify-center">
+                <Users className="w-7 h-7 text-emerald-600" />
               </div>
             </div>
           </div>
-
-
         </div>
 
         {/* Search Bar */}
-        <div className="mb-6">
-          <div className="relative">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search users by name, email, or role..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white shadow-sm"
-            />
+        <div className="mb-8">
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <div className="flex items-center gap-4">
+              <div className="flex-1">
+                <label className="block text-slate-700 text-sm font-semibold mb-2">Search Users</label>
+                <div className="relative">
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="Search by username, email, or role..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-12 pr-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-slate-50 text-slate-800 placeholder-slate-400 font-medium"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* User Table */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+          <div className="px-6 py-5 border-b border-slate-200 bg-slate-50">
+            <h2 className="text-xl font-bold text-slate-800">Users Directory</h2>
+            <p className="text-slate-600 text-sm mt-1">View and manage all registered users</p>
+          </div>
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-slate-100 border-b border-slate-200">
                 <tr>
-                  <th className="px-6 py-4 text-left text-sm text-gray-600">User</th>
-                  <th className="px-6 py-4 text-left text-sm text-gray-600">Email</th>
-                  <th className="px-6 py-4 text-left text-sm text-gray-600">Role</th>
-                  <th className="px-6 py-4 text-left text-sm text-gray-600">Sex</th>
-                  <th className="px-6 py-4 text-left text-sm text-gray-600">Join In</th>
-                  <th className="px-6 py-4 text-right text-sm text-gray-600">Actions</th>
+                  <th className="px-6 py-4 text-left text-sm font-bold text-slate-700 uppercase tracking-wider">User</th>
+                  <th className="px-6 py-4 text-left text-sm font-bold text-slate-700 uppercase tracking-wider">Email</th>
+                  <th className="px-6 py-4 text-left text-sm font-bold text-slate-700 uppercase tracking-wider">Role</th>
+                  <th className="px-6 py-4 text-left text-sm font-bold text-slate-700 uppercase tracking-wider">Gender</th>
+                  <th className="px-6 py-4 text-left text-sm font-bold text-slate-700 uppercase tracking-wider">Active</th>
+                  <th className="px-6 py-4 text-left text-sm font-bold text-slate-700 uppercase tracking-wider">Joined</th>
+                  <th className="px-6 py-4 text-right text-sm font-bold text-slate-700 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
-
+              <tbody className="divide-y divide-slate-200">
                 {
-                  users && users.map((user) => (
-                    <tr key={user.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4">
-                        {/* User */}
-                        <div className="flex items-center gap-3">
-    
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-rose-500 to-rose-300 flex items-center justify-center text-white flex-shrink-0">
-                            {user.profile && user.profile.avatar ? (
-                              <img
-                                src={user.profile.avatar}
-                                alt={user.username}
-                                className="w-full h-full rounded-full object-cover"
-                              />
-                            ) :
-                            (user.username.charAt(0))
-                            }
-                          </div>
-                          <span className="text-gray-900">{user.username}</span>
-                        </div>
-                      </td>
-                      {/* Email */}
-                      <td className="px-6 py-4 text-sm text-gray-600">{user.email}</td>
-                      {/* Role */}
-                      <td className="px-6 py-4">
-                        <span className="inline-flex px-3 py-1 rounded-full text text-shadow-2xs bg-blue-100 text-blue-800">
-                          {user.role}
-                        </span>
-                      </td>
-                      {/* Sex */}
-                      <td className="px-6 py-4">
-                        {user.sex ? <span className={`${user.sex === "Male" ? "text-blue-400" : "text-rose-400"}`}>{user.sex}</span>
-                        : <span className="text-gray-400">N/A</span>}
-      
-                      </td>
-                      <td className="px-6 py-4 text-sm text-shadow-2xs text-gray-600 w-[100px]">
-                        {new Date(user.createdAt).toLocaleString('vi-VN', {
-                          timeZone: 'Asia/Ho_Chi_Minh',
-                          year: 'numeric',
-                          month: '2-digit',
-                          day: '2-digit',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                          second: '2-digit'
-                        })}
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={() => handleViewDetails(user)}
-                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
-                            title="View details"
-                          >
-                            <Eye className="w-5 h-5" />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteClick(user)}
-                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
-                            title="Delete user"
-                          >
-                            <Trash2 className="w-5 h-5" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
+                  users && users.map((user, index) => (
+                      <UserLine key ={index} userInfo = {user}></UserLine>
                   ))
                 }
               </tbody>
             </table>
-            <div className = "h-5"></div>
-            <PaginationComponent numberOfPages = {numberOfPages} currentPage = {currentPage} controlPage={handleSetCurrentPage} ></PaginationComponent>
+
+          {/* Pagination */}
+          <div className="px-6 py-5 bg-slate-50 border-t border-slate-200">
+            <div className="flex items-center justify-between">
+              <div className="text-slate-600 text-sm font-medium">
+                Showing page <span className="font-bold text-slate-800">{currentPage}</span> of <span className="font-bold text-slate-800">{numberOfPages}</span>
+              </div>
+              <PaginationComponent
+                numberOfPages={numberOfPages}
+                currentPage={currentPage}
+                controlPage={handleSetCurrentPage}
+              />
+            </div>
           </div>
-          
         </div>
         
-        {/* Modals */}
-        <UserDetailModal user={selectedUser} onClose={() => setSelectedUser(null)} />
-        <DeleteConfirmModal 
-          user={userToDelete} 
-          onClose={() => setUserToDelete(null)} 
-        />
 
-        
-        
       </div>
     </div>
+    </div>
+
   );
 }

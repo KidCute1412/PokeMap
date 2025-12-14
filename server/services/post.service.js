@@ -2,7 +2,6 @@ import { Post } from '../models/post.model.js'
 import {Like} from '../models/like.model.js'
 import {Follow} from '../models/follow.model.js'
 import { PostWarning } from '../models/postModeration.model.js'
-import {User} from '../models/user.model.js';
 import sendEmail from '../config/email.config.js';
 import mongoose from 'mongoose';
 export const getAllPosts = async ({page, limit}) => {
@@ -18,10 +17,6 @@ export const getAllPosts = async ({page, limit}) => {
         {
             $sort: { createdAt: -1 },
         },
-        {
-            $match: { isDeleted: { $ne: true } }
-        }
-        ,
         {
             $lookup: {
                 from : "users",
@@ -89,15 +84,12 @@ export const warnPost = async (postId, warningType, description, warnedBy) => {
     const post = await Post.findById(postId);
 
 
-    // THIS IS A MOCKED USER ID FOR TESTING PURPOSES
-    const mockwarnedBy = "6932dbfa4359cbdf3b5f0405";
-    warnedBy = mockwarnedBy; // Temporary hardcoded user ID for testing
     if (!post) {
-        throw new Error('Post not found');
+        return null;
     }
     console.log("Post found:", postId);
     // Check existing warnings for this post
-    const existingWarning = await PostWarning.findOne({ post: postId, isResolved: false });
+    const existingWarning = await PostWarning.findOne({ post: postId});
     console.log("Existing warning:", existingWarning);
     let warningCount = 1;
     let warning;
@@ -105,6 +97,7 @@ export const warnPost = async (postId, warningType, description, warnedBy) => {
     if (existingWarning) {
         // Update existing warning
         existingWarning.warningCount += 1;
+        existingWarning.warningCount = existingWarning.warningCount >= 3 ? 3 : existingWarning.warningCount;
         warningCount = existingWarning.warningCount;
         warning = await existingWarning.save();
     } else {
@@ -120,7 +113,15 @@ export const warnPost = async (postId, warningType, description, warnedBy) => {
         warning = await warning.save();
         console.log("New warning saved:", warning);
     }
-  
+    if (post.isDeleted){
+        return {
+            code : "FAILED",
+            message: `Post is already deleted.`,
+            warning_counts: warningCount,
+            isDeleted: post.isDeleted,
+            deletedAt: post.deletedAt
+        }
+    }
     // Update post
     post.isWarned = true;
     const author = await Post.findById(postId).populate('user');
@@ -129,11 +130,82 @@ export const warnPost = async (postId, warningType, description, warnedBy) => {
     if (author.user && author.user.email) {
         // @ts-ignore
         console.log("Sending email to: ", author.user.email);
+
+        const htmlContent = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
+                <div style="background-color: #ffffff; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <h1 style="color: #ff6b35; margin: 0; font-size: 28px;">⚠️ Post Warning</h1>
+                    </div>
+
+                    <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+                        <h2 style="color: #856404; margin: 0 0 15px 0; font-size: 20px;">Your post has been warned</h2>
+                        <p style="color: #856404; margin: 0; font-size: 16px; line-height: 1.5;">
+                            Your post has received a warning and requires your attention.
+                        </p>
+                    </div>
+
+                    <div style="margin-bottom: 25px;">
+                        <h3 style="color: #333; margin: 0 0 15px 0; font-size: 18px;">Warning Details:</h3>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr>
+                                <td style="padding: 10px 0; border-bottom: 1px solid #eee; font-weight: bold; color: #555; width: 120px;">Post Content:</td>
+                                <td style="padding: 10px 0; border-bottom: 1px solid #eee; color: #333;">
+                                    <div style="max-height: 100px; overflow-y: auto; background-color: #f8f9fa; padding: 8px; border-radius: 4px; border: 1px solid #dee2e6;">
+                                        ${post.content.length > 300 ? post.content.substring(0, 300) + '...' : post.content}
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 0; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Warning Type:</td>
+                                <td style="padding: 10px 0; border-bottom: 1px solid #eee; color: #333;">${warningType}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 0; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Description:</td>
+                                <td style="padding: 10px 0; border-bottom: 1px solid #eee; color: #333;">${description}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 0; font-weight: bold; color: #555;">Warning Count:</td>
+                                <td style="padding: 10px 0; color: #d9534f; font-weight: bold; font-size: 18px;">${warningCount} out of 3</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    ${warningCount >= 3 ?
+                        `<div style="background-color: #f8d7da; border: 1px solid #f5c6cb; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+                            <h3 style="color: #721c24; margin: 0 0 10px 0; font-size: 18px;">🚫 Critical Warning</h3>
+                            <p style="color: #721c24; margin: 0; font-size: 16px; line-height: 1.5;">
+                                This is your third warning. Your post has been automatically deleted as per our community guidelines.
+                            </p>
+                        </div>`
+                        :
+                        `<div style="background-color: #d1ecf1; border: 1px solid #bee5eb; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+                            <h3 style="color: #0c5460; margin: 0 0 10px 0; font-size: 18px;">📋 Important Notice</h3>
+                            <p style="color: #0c5460; margin: 0; font-size: 16px; line-height: 1.5;">
+                                Please review our community guidelines and ensure your future posts comply with our rules.
+                                ${warningCount === 2 ? 'This is your second warning. One more will result in post deletion.' : ''}
+                            </p>
+                        </div>`
+                    }
+
+                    <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+                        <p style="color: #666; margin: 0; font-size: 14px;">
+                            If you have any questions, please contact our support team.
+                        </p>
+                        <p style="color: #999; margin: 10px 0 0 0; font-size: 12px;">
+                            This is an automated message. Please do not reply to this email.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        `;
+
         sendEmail(
         // @ts-ignore
         author.user.email,
         'Your post has been warned',
-        `Your post with ID ${postId} has received a warning for the following reason: ${warningType}. Description: ${description}. This is warning ${warningCount} out of 3.`
+        htmlContent,
+        true
         );
     }
     
@@ -147,11 +219,6 @@ export const warnPost = async (postId, warningType, description, warnedBy) => {
         warning.resolvedAt = new Date();
         await warning.save();
         
-        await post.save();
-        return {
-            message: 'Post has been warned 3 times and deleted',
-            data: { post, warning }
-        };
     }
 
     // Save the updated post
@@ -159,7 +226,9 @@ export const warnPost = async (postId, warningType, description, warnedBy) => {
 
     return {
         message: `Post warned successfully. Warning count: ${warningCount}/3`,
-        data: { post, warning }
+        warning_counts: warningCount,
+        isDeleted: post.isDeleted,
+        deletedAt: post.deletedAt
     };
 };
 
@@ -170,10 +239,19 @@ export const findAuthorByPostId = async (postId) => {
 
 
 export const deletePost = async (postId) => {
-    return await Post.findByIdAndUpdate(postId, {
+    const result = await Post.findByIdAndUpdate(postId, {
         isDeleted: true,
         deletedAt: new Date()
     }, { new: true });
+    return result;
+}
+
+export const recoverPost = async (postId) => {
+    const result = await Post.findByIdAndUpdate(postId, {
+        isDeleted: false,
+        deletedAt: null
+    }, { new: true });
+    return result;
 }
 
 

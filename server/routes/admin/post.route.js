@@ -14,4 +14,6 @@ router.patch('/warn/:postId', postController.warnPost);
 
 router.patch('/delete/:postId', postController.deletePost);
 
+router.patch('/recover/:postId', postController.recoverPost);
+
 export default router;

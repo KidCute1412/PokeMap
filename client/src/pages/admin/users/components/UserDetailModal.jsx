@@ -1,25 +1,15 @@
 import {X, UserPlus, Heart, Users, Mail, Calendar, Clock} from 'lucide-react';
-import {useEffect} from "react";
-import "animate.css";
-export default function UserDetailModal ({ user, onClose }) {
-  if (!user) return null;
-  useEffect (() => {
-    
-    // Click outside to close modal
-    const handleOutsideClick = (event) => {
-      if (event.target.classList.contains('fixed')) {
-        onClose();
-      }
-    };
+export default function UserDetailModal ({ user, setOpenModal }) {
 
-    window.addEventListener('click', handleOutsideClick);
-    return () => {
-      window.removeEventListener('click', handleOutsideClick);
-    };
-  })
+
   return (
     <div className="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-3xl shadow-2xl max-w-5xl w-full max-h-[95vh] overflow-hidden animate__animated animate__zoomIn">
+      {/* Click outside to close */}
+      <div
+        className="absolute inset-0"
+        onClick={() => setOpenModal(false)}
+      ></div>
+      <div className="bg-white rounded-3xl shadow-2xl max-w-5xl w-full max-h-[95vh] overflow-hidden animate__animated animate__fadeInDown animate_faster">
         {/* Modal Header - Hero Style with Avatar Background */}
         <div className="relative bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 text-white">
           {/* Background Pattern */}
@@ -70,7 +60,7 @@ export default function UserDetailModal ({ user, onClose }) {
 
             {/* Close Button */}
             <button
-              onClick={onClose}
+              onClick={() => setOpenModal(false)}
               className="p-3 bg-white/10 cursor-pointer hover:bg-white/20 rounded-full transition-all duration-200 backdrop-blur-sm hover:scale-105"
             >
               <X className="w-6 h-6" />

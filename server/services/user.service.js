@@ -4,12 +4,7 @@ import speakingURL from "speakingurl"
 export const getAllUsers = async ({page, limit}) => {
   try {
     const skip = (page - 1) * limit;
-    // const users = await User.find()
-    //   .skip(skip)
-    //   .limit(limit)
-    //   .sort({ createdAt: -1 }); // Sắp xếp theo thời gian tạo, mới nhất trước
 
-    // add following and followers count to profile (join with follows collection)
 
     const userInfos = await User.aggregate ([
       {
@@ -71,7 +66,21 @@ export const countUsers = async () => {
 }
 
 export const deleteUser = async (userId) => {
-  return await User.findByIdAndDelete(userId);
+  // set bannedAt field to current date
+  return await User.findByIdAndUpdate(
+    userId,
+    { bannedAt: new Date() },
+    { new: true }
+  );
+}
+
+export const restoreUser = async (userId) => {
+  // set bannedAt field to null
+  return await User.findByIdAndUpdate(
+    userId,
+    { bannedAt: null },
+    { new: true }
+  );
 }
 
 export const isUserNameExist = async (id, username) => {

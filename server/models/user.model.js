@@ -54,11 +54,17 @@ const userSchema = new mongoose.Schema({
     selectedPokemon: {
         type: [Number], // Array of Pokemon IDs
         default: []
+    },
+    bannedAt: {
+        type: Date,
+        default: null
     }
-},
+    },
     {
         timestamps: true,
         strict: false
-    });
+    }
+    
+);
 
 export const User = mongoose.model('Users', userSchema);

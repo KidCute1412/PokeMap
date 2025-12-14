@@ -4,13 +4,15 @@ import * as userController from '../../controllers/admin/user.controller.js';
 
 const router = express.Router();
 
-router.get('/listUsers', userController.getUsers);
+router.get('/listUsers', userController.getUserLists);
 
 router.get('/detailUser/:id', userController.getUserById);
 
 router.delete('/deleteUser/:id', userController.deleteUser);
 
-router.get('/total-pages', userController.getTotalUserPages);
+router.patch('/restoreUser/:id', userController.restoreUser);
+
+// router.get('/total-pages', userController.getTotalUserPages);
 
 router.get('/total-users', userController.getTotalUsers);
 

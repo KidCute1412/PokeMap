@@ -54,7 +54,9 @@ export default function ProfileHeader({isMiniCard = false, user_id_outside = nul
                         {
                             (userProfile && userProfile.sex && (userProfile.sex).toUpperCase() === "MALE") ?
                             (<p className={`${isMiniCard ? 'text-blue-400 text-sm mb-2' : 'text-blue-400 text-lg mb-4'}`}>Male Trainer</p>) :
-                            (<p className={`${isMiniCard ? 'text-rose-400 text-sm mb-2' : 'text-rose-400 text-lg mb-4'}`}>Female Trainer</p>)
+                            (userProfile && userProfile.sex && (userProfile.sex).toUpperCase () === "FEMALE" ? 
+                            <p className={`${isMiniCard ? 'text-rose-400 text-sm mb-2' : 'text-rose-400 text-lg mb-4'}`}>Female Trainer</p> :
+                            <p className={`${isMiniCard ? 'text-gray-400 text-sm mb-2' : 'text-gray-400 text-lg mb-4'}`}>Trainer</p>)
                         }
                         {/* Email - chỉ hiển thị khi không phải mini card */}
                         {!isMiniCard && (
