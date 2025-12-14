@@ -1,11 +1,35 @@
 import { User, FileText, LogOut, LayoutDashboard } from 'lucide-react';
 // @ts-expect-error
 import milotic from '@/assets/icons/milotic.png';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {useState, useEffect} from "react";
+import { toast } from "sonner";
+
 export default function Sidebar() {
 
     const location = useLocation();
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        fetch("http://localhost:10000/api/admin/auth/logout", {
+            method: "POST",
+            credentials: "include"
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                localStorage.removeItem("adminToken");
+                toast.success("Logged out successfully");
+                navigate("/admin/auth/login");
+            }
+        })
+        .catch(error => {
+            console.error("Logout error:", error);
+            // Still remove token and redirect on error
+            localStorage.removeItem("adminToken");
+            navigate("/admin/auth/login");
+        });
+    };
 
     useEffect (() => {
         const updatedMenuItems = menuItems.map(item => ({
@@ -62,7 +86,7 @@ export default function Sidebar() {
             <span className="font-medium">Settings</span>
             </button>
             
-            <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-100 transition-colors cursor-pointer">
+            <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-100 transition-colors cursor-pointer">
             <LogOut className="w-5 h-5" />
             <span className="font-medium">Logout</span>
             </button>

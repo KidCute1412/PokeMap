@@ -4,14 +4,14 @@ import { generateOTP, hashPassword, comparePassword } from '../helpers/auth.help
 
 // SIGNUP SERVICE - Create pending user and send OTP
 export const signupService = async (email, password, username, role = 'user') => {
-    // 1. Check if user already exists
-    const existingUser = await User.findOne({ email, role });
+    // 1. Check if user already exists (check both as user and admin)
+    const existingUser = await User.findOne({ email });
     if (existingUser) {
-        throw new Error(`Email already registered as ${role}`);
+        throw new Error(`Email already registered`);
     }
 
-    // 2. Check if email exists in pending (delete old entry)
-    await PendingUser.deleteOne({ email });
+    // 2. Check if email exists in pending (delete old entry for same role)
+    await PendingUser.deleteOne({ email, role });
 
     // 3. Hash password
     const hashedPassword = await hashPassword(password);

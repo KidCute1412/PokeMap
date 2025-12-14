@@ -12,8 +12,14 @@ import DashBoardPage from "@/pages/admin/DashboardPage.jsx";
 import UserAdminPage from "@/pages/admin/users/UserAdminPage.jsx";
 import PostAdminPage from "@/pages/admin/posts/PostAdminPage.jsx";
 import ProtectedRouter from "@/routes/ProtectedRouter.jsx";
+import AdminProtectedRouter from "@/routes/AdminProtectedRouter.jsx";
 import EditProfile from "@/pages/client/Profile/components/EditProfile";
 import ChangePassword from "@/pages/client/Profile/components/ChangePassword";
+
+// Admin Auth Pages
+import AdminLoginPage from "@/pages/admin/auth/AdminLoginPage.jsx";
+import AdminRegisterPage from "@/pages/admin/auth/AdminRegisterPage.jsx";
+import AdminForgotPasswordPage from "@/pages/admin/auth/AdminForgotPasswordPage.jsx";
 
 const routers = createBrowserRouter([
     {
@@ -66,11 +72,30 @@ const routers = createBrowserRouter([
             }
         ]
     },
+    // Admin Auth Routes (không cần bảo vệ)
+    {
+        path: "/admin/auth",
+        children: [
+            {
+                path: "login",
+                element: <AdminLoginPage></AdminLoginPage>
+            },
+            {
+                path: "register",
+                element: <AdminRegisterPage></AdminRegisterPage>
+            },
+            {
+                path: "forgot-password",
+                element: <AdminForgotPasswordPage></AdminForgotPasswordPage>
+            }
+        ]
+    },
+    // Admin Dashboard Routes (cần bảo vệ)
     {
         path: "/admin",
-        element: <ProtectedRouter>
-                    <AdminLayout></AdminLayout>
-                </ProtectedRouter>,
+        element: <AdminProtectedRouter>
+            <AdminLayout></AdminLayout>
+        </AdminProtectedRouter>,
         children: [
             {
                 path: "",
