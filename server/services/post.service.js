@@ -619,3 +619,98 @@ export const followUserFromPost = async ({postId, userId}) => {
     }
 
 }
+
+
+// Get post detail by postId
+export const getPostDetail = async ({ postId, viewer }) => {
+    const post_id = new mongoose.Types.ObjectId(postId);
+    
+    const postDetail = await Post.aggregate([
+        {
+            $match: { _id: post_id, isDeleted: { $ne: true } }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "user",
+                foreignField: "_id",
+                as: "userInfo"
+            }
+        },
+        {
+            $lookup: {
+                from: "comments",
+                localField: "_id",
+                foreignField: "post",
+                as: "comments"
+            }
+        },
+        {
+            $lookup: {
+                from: "likes",
+                localField: "_id",
+                foreignField: "post",
+                as: "likes"
+            }
+        },
+        // is Liked by viewer
+        {
+            $lookup: {
+                from: "likes",
+                let: { postId: "$_id" },
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: {
+                                $and: [
+                                    { $eq: ["$post", "$$postId"] },
+                                    { $eq: ["$user", viewer ? new mongoose.Types.ObjectId(viewer._id) : null] }
+                                ]
+                            }
+                        }
+                    }
+                ],
+                as: "isLikedByViewer"
+            }
+        },
+        {
+            $lookup: {
+                from: "follows",
+                let: { postUserId: "$user" },
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: {
+                                $and: [
+                                    { $eq: ["$follower", viewer ? new mongoose.Types.ObjectId(viewer._id) : null] },
+                                    { $eq: ["$following", "$$postUserId"] }
+                                ]
+                            }
+                        }
+                    }
+                ],
+                as: "followInfo"
+            }
+        },
+        {
+            $addFields: {
+                'comments': { $size: "$comments" },
+                'likes': { $size: "$likes" },
+                'username': { $arrayElemAt: ["$userInfo.username", 0] },
+                'avatar': { $arrayElemAt: ["$userInfo.profile.avatar", 0] },
+                'isFollowing': { $gt: [{ $size: "$followInfo" }, 0] },
+                'isLiked': { $gt: [{ $size: "$isLikedByViewer" }, 0] },
+                'owner_id': { $arrayElemAt: ["$userInfo._id", 0] }
+            }
+        },
+        {
+            $project: {
+                userInfo: 0,
+                followInfo: 0,
+                isLikedByViewer: 0
+            }
+        }
+    ]);
+
+    return postDetail.length > 0 ? postDetail[0] : null;
+}
