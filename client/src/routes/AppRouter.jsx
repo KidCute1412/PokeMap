@@ -6,6 +6,8 @@ import ProfilePage from "@/pages/client/Profile/ProfilePage.jsx";
 import MapPage from "@/pages/client/MapPage.jsx";
 import PokedexPage from "@/pages/client/PokedexPage";
 import PokeDetail from "@/pages/client/PokeDetail";
+import SearchPage from "@/pages/client/SearchPage.jsx";
+import PostPage from "@/pages/client/PostPage.jsx";
 import LoginPage from "@/pages/auth/LoginPage.jsx";
 import RegisterPage from "@/pages/auth/RegisterPage";
 import DashBoardPage from "@/pages/admin/DashboardPage.jsx";
@@ -56,6 +58,14 @@ const routers = createBrowserRouter([
             {
                 path: "profile/change-password",
                 element: <ChangePassword></ChangePassword>
+            },
+            {
+                path: "search",
+                element: <SearchPage></SearchPage>
+            },
+            {
+                path: "post/:postId",
+                element: <PostPage></PostPage>
             }
         ]
     },

@@ -1,6 +1,22 @@
 import * as commentService from './comment.service.js';
 
+// Store io instance globally để các service khác có thể sử dụng
+let ioInstance = null;
+
+export function getIO() {
+    return ioInstance;
+}
+
+// Store user socket mappings (userId -> socketId)
+const userSockets = new Map();
+
+export function getUserSocketId(userId) {
+    return userSockets.get(userId.toString());
+}
+
 export function initSocket(io) {
+    ioInstance = io;
+    
     io.on("connection", (socket) => {
         // User joins post room để nhận real-time updates
         socket.on("join_post", (postId) => {
@@ -10,6 +26,23 @@ export function initSocket(io) {
         // User leaves post room
         socket.on("leave_post", (postId) => {
             socket.leave(`post_${postId}`);
+        });
+        
+        // User đăng ký nhận notification
+        socket.on("register_user", (userId) => {
+            if (userId) {
+                userSockets.set(userId.toString(), socket.id);
+                socket.join(`user_${userId}`);
+                console.log(`User ${userId} registered for notifications`);
+            }
+        });
+        
+        // User unregister (khi logout)
+        socket.on("unregister_user", (userId) => {
+            if (userId) {
+                userSockets.delete(userId.toString());
+                socket.leave(`user_${userId}`);
+            }
         });
 
         // Comment mới được tạo
@@ -121,7 +154,22 @@ export function initSocket(io) {
         });
 
         socket.on("disconnect", () => {
-            // Client disconnected
+            // Remove user from userSockets map
+            for (const [userId, socketId] of userSockets.entries()) {
+                if (socketId === socket.id) {
+                    userSockets.delete(userId);
+                    break;
+                }
+            }
         })
     })
+}
+
+/**
+ * Gửi notification real-time tới user
+ */
+export function sendNotificationToUser(userId, notification) {
+    if (ioInstance) {
+        ioInstance.to(`user_${userId}`).emit("new_notification", notification);
+    }
 }

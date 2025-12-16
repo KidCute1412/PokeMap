@@ -4,6 +4,7 @@ import {Follow} from '../models/follow.model.js'
 import { PostWarning } from '../models/postModeration.model.js'
 import sendEmail from '../config/email.config.js';
 import mongoose from 'mongoose';
+import * as notificationService from './notification.service.js';
 export const getAllPosts = async ({page, limit}) => {
     const skip = (page - 1) * limit;
 
@@ -575,9 +576,22 @@ export const getUserPosts = async ({userId, viewer}) => {
 
 export const likePost = async ({postId, user}) => {
     const existingLike = await Like.findOne({post: postId, user: user._id});
+    const post = await Post.findById(postId);
+    
     if (existingLike) {
         // Unlike
         await Like.deleteOne({ _id: existingLike._id });
+        
+        // Xóa thông báo khi unlike
+        if (post) {
+            await notificationService.deleteNotification({
+                senderId: user._id,
+                recipientId: post.user,
+                type: 'like_post',
+                postId: postId
+            });
+        }
+        
         return { message: "Post unliked" };
     } else {
         // Like
@@ -586,6 +600,19 @@ export const likePost = async ({postId, user}) => {
             user: user._id
         });
         await newLike.save();
+        
+        // Tạo thông báo khi like
+        if (post) {
+            const contentPreview = post.content ? post.content.substring(0, 100) : '';
+            await notificationService.createNotification({
+                recipientId: post.user,
+                senderId: user._id,
+                type: 'like_post',
+                postId: postId,
+                contentPreview
+            });
+        }
+        
         return { message: "Post liked" };
     }
 }
@@ -618,4 +645,99 @@ export const followUserFromPost = async ({postId, userId}) => {
         return { message: "User followed" };
     }
 
+}
+
+
+// Get post detail by postId
+export const getPostDetail = async ({ postId, viewer }) => {
+    const post_id = new mongoose.Types.ObjectId(postId);
+    
+    const postDetail = await Post.aggregate([
+        {
+            $match: { _id: post_id, isDeleted: { $ne: true } }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "user",
+                foreignField: "_id",
+                as: "userInfo"
+            }
+        },
+        {
+            $lookup: {
+                from: "comments",
+                localField: "_id",
+                foreignField: "post",
+                as: "comments"
+            }
+        },
+        {
+            $lookup: {
+                from: "likes",
+                localField: "_id",
+                foreignField: "post",
+                as: "likes"
+            }
+        },
+        // is Liked by viewer
+        {
+            $lookup: {
+                from: "likes",
+                let: { postId: "$_id" },
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: {
+                                $and: [
+                                    { $eq: ["$post", "$$postId"] },
+                                    { $eq: ["$user", viewer ? new mongoose.Types.ObjectId(viewer._id) : null] }
+                                ]
+                            }
+                        }
+                    }
+                ],
+                as: "isLikedByViewer"
+            }
+        },
+        {
+            $lookup: {
+                from: "follows",
+                let: { postUserId: "$user" },
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: {
+                                $and: [
+                                    { $eq: ["$follower", viewer ? new mongoose.Types.ObjectId(viewer._id) : null] },
+                                    { $eq: ["$following", "$$postUserId"] }
+                                ]
+                            }
+                        }
+                    }
+                ],
+                as: "followInfo"
+            }
+        },
+        {
+            $addFields: {
+                'comments': { $size: "$comments" },
+                'likes': { $size: "$likes" },
+                'username': { $arrayElemAt: ["$userInfo.username", 0] },
+                'avatar': { $arrayElemAt: ["$userInfo.profile.avatar", 0] },
+                'isFollowing': { $gt: [{ $size: "$followInfo" }, 0] },
+                'isLiked': { $gt: [{ $size: "$isLikedByViewer" }, 0] },
+                'owner_id': { $arrayElemAt: ["$userInfo._id", 0] }
+            }
+        },
+        {
+            $project: {
+                userInfo: 0,
+                followInfo: 0,
+                isLikedByViewer: 0
+            }
+        }
+    ]);
+
+    return postDetail.length > 0 ? postDetail[0] : null;
 }

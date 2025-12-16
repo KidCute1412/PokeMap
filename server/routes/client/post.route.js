@@ -12,6 +12,9 @@ route.post("/home", justDecodeToken, postController.getPostsInHome); // done
 route.get("/get_user_post", justDecodeToken, postController.getUserPosts); // query userId  // done
 route.post("/:postId/like", verifyToken, postController.likePost); // done
 
+// Get single post detail
+route.get("/:postId/detail", justDecodeToken, postController.getPostDetail);
+
 //Comment routes
 route.get("/:postId/comments", postController.getPostComments);
 route.get("/comments/:commentId/replies", postController.getCommentReplies);

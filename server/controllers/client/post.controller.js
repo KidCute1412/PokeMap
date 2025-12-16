@@ -179,3 +179,30 @@ export const followUserFromPost = async (req, res) => {
     }
     res.json({ success: true, message: "User followed successfully" });
 }
+
+export const getPostDetail = async (req, res) => {
+    try {
+        const postId = req.params.postId;
+        const viewer = req.user || null;
+        
+        const post = await postService.getPostDetail({ postId, viewer });
+        
+        if (!post) {
+            return res.status(404).json({
+                status: "error",
+                message: "Post not found"
+            });
+        }
+        
+        res.json({
+            status: "success",
+            message: "Post fetched successfully",
+            data: post
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: "error",
+            message: error.message || "Error fetching post"
+        });
+    }
+}
