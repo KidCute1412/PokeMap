@@ -161,7 +161,7 @@ export default function MarkerInfoModal({ marker, onClose, onSave, onDelete, pok
             steel: 'bg-gray-400',
             fairy: 'bg-pink-300'
         };
-        return colors[type] || 'bg-gray-500';
+        return colors[type] || 'bg-transparent';
     };
 
     return (

@@ -93,9 +93,12 @@ const routers = createBrowserRouter([
     // Admin Dashboard Routes (cần bảo vệ)
     {
         path: "/admin",
-        element: <AdminProtectedRouter>
-            <AdminLayout></AdminLayout>
-        </AdminProtectedRouter>,
+        // element: <AdminProtectedRouter>
+        //     <AdminLayout></AdminLayout>
+        // </AdminProtectedRouter>,
+        element: <ProtectedRouter>
+                    <AdminLayout></AdminLayout>
+                </ProtectedRouter>,
         children: [
             {
                 path: "",

@@ -52,7 +52,7 @@
                 setTimeout(() => {
                     setLoading(false);
                     isFetchingRef.current = false;
-                }, 2000);
+                }, 1000);
                 
             });
         }, [newPostsObserver.isIntersecting, loading, hasMore, usedPostsIds]);
