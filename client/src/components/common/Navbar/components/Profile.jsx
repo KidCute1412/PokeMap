@@ -4,7 +4,7 @@ import {useAuth} from "@/routes/ProtectedRouter.jsx";
 import speakingURL from "speakingurl"
 import {toast} from "sonner"
 import BellNotification from "@/components/common/Navbar/components/BellNotification.jsx";
-import {MenuInsideBell} from "@/components/common/Navbar/components/BellNotification";
+
 export default function Profile(){
     const {user} = useAuth();
     const navigate = useNavigate();
@@ -68,9 +68,7 @@ export default function Profile(){
         <div className="flex items-center">
             {user ? (
                 <>
-                    <BellNotification>
-                        <MenuInsideBell />
-                    </BellNotification>
+                    <BellNotification />
 
                     {/* Profile Dropdown */}
                     <div className="relative ml-4" ref={dropdownRef}>

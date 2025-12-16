@@ -4,6 +4,7 @@ import {Follow} from '../models/follow.model.js'
 import { PostWarning } from '../models/postModeration.model.js'
 import sendEmail from '../config/email.config.js';
 import mongoose from 'mongoose';
+import * as notificationService from './notification.service.js';
 export const getAllPosts = async ({page, limit}) => {
     const skip = (page - 1) * limit;
 
@@ -575,9 +576,22 @@ export const getUserPosts = async ({userId, viewer}) => {
 
 export const likePost = async ({postId, user}) => {
     const existingLike = await Like.findOne({post: postId, user: user._id});
+    const post = await Post.findById(postId);
+    
     if (existingLike) {
         // Unlike
         await Like.deleteOne({ _id: existingLike._id });
+        
+        // Xóa thông báo khi unlike
+        if (post) {
+            await notificationService.deleteNotification({
+                senderId: user._id,
+                recipientId: post.user,
+                type: 'like_post',
+                postId: postId
+            });
+        }
+        
         return { message: "Post unliked" };
     } else {
         // Like
@@ -586,6 +600,19 @@ export const likePost = async ({postId, user}) => {
             user: user._id
         });
         await newLike.save();
+        
+        // Tạo thông báo khi like
+        if (post) {
+            const contentPreview = post.content ? post.content.substring(0, 100) : '';
+            await notificationService.createNotification({
+                recipientId: post.user,
+                senderId: user._id,
+                type: 'like_post',
+                postId: postId,
+                contentPreview
+            });
+        }
+        
         return { message: "Post liked" };
     }
 }

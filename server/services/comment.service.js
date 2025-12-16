@@ -2,6 +2,7 @@ import { Comment } from '../models/comment.model.js';
 import { User } from '../models/user.model.js';
 import { Post } from '../models/post.model.js';
 import mongoose from 'mongoose';
+import * as notificationService from './notification.service.js';
 
 // Tạo comment mới cho post
 export const createComment = async ({ postId, userId, content, images = [], parentCommentId = null }) => {
@@ -18,8 +19,9 @@ export const createComment = async ({ postId, userId, content, images = [], pare
     }
 
     // Nếu là reply, validate parent comment exists
+    let parentComment = null;
     if (parentCommentId) {
-        const parentComment = await Comment.findById(parentCommentId);
+        parentComment = await Comment.findById(parentCommentId);
         if (!parentComment) {
             throw new Error('Parent comment not found');
         }
@@ -33,7 +35,34 @@ export const createComment = async ({ postId, userId, content, images = [], pare
         parentComment: parentCommentId || null
     });
 
-    return await comment.save();
+    const savedComment = await comment.save();
+
+    // Tạo thông báo
+    const contentPreview = content ? content.substring(0, 100) : '';
+    
+    if (parentCommentId && parentComment) {
+        // Nếu là reply comment, thông báo cho chủ comment gốc
+        await notificationService.createNotification({
+            recipientId: parentComment.user,
+            senderId: userId,
+            type: 'reply_comment',
+            postId: postId,
+            commentId: savedComment._id,
+            contentPreview
+        });
+    } else {
+        // Nếu là comment post, thông báo cho chủ post
+        await notificationService.createNotification({
+            recipientId: post.user,
+            senderId: userId,
+            type: 'comment_post',
+            postId: postId,
+            commentId: savedComment._id,
+            contentPreview
+        });
+    }
+
+    return savedComment;
 };
 
 // Lấy tất cả comments của một post (kèm replies)
@@ -263,9 +292,28 @@ export const toggleLikeComment = async ({ commentId, userId }) => {
     if (hasLiked) {
         // Unlike - remove user from likedBy
         comment.likedBy = comment.likedBy.filter(id => id.toString() !== userIdStr);
+        
+        // Xóa thông báo khi unlike
+        await notificationService.deleteNotification({
+            senderId: userId,
+            recipientId: comment.user,
+            type: 'like_comment',
+            commentId: commentId
+        });
     } else {
         // Like - add user to likedBy
         comment.likedBy.push(userId);
+        
+        // Tạo thông báo khi like comment
+        const contentPreview = comment.content ? comment.content.substring(0, 100) : '';
+        await notificationService.createNotification({
+            recipientId: comment.user,
+            senderId: userId,
+            type: 'like_comment',
+            postId: comment.post,
+            commentId: commentId,
+            contentPreview
+        });
     }
 
     await comment.save();
