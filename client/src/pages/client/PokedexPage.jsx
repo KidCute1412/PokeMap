@@ -65,7 +65,9 @@ export default function PokedexPage() {
 
       const matchesType = 
         selectedTypes.length === 0 || 
-        pokemon.types.some(t => selectedTypes.includes(t.type.name));
+        selectedTypes.every(type => 
+          pokemon.types.some(t => t.type.name === type)
+        );
 
       return matchesSearch && matchesType;
     });
