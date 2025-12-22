@@ -60,7 +60,7 @@ const PokedexFilterBar = ({
             </div>
           </div>
 
-          <div>
+          {/* <div>
             <h4 className="text-white font-bold mb-3 text-lg">Category</h4>
             <div className="flex gap-6">
               <label className="flex items-center space-x-2 cursor-pointer text-gray-300 hover:text-white">
@@ -72,13 +72,13 @@ const PokedexFilterBar = ({
                 <span>Rock</span>
               </label>
             </div>
-          </div>
+          </div> */}
 
-          <div className="flex justify-end mt-4">
+          {/* <div className="flex justify-end mt-4">
              <button className="bg-purple-500/80 hover:bg-purple-500 text-white text-sm px-6 py-2 rounded-full">
                 Apply
              </button>
-          </div>
+          </div> */}
         </div>
       )}
     </div>
