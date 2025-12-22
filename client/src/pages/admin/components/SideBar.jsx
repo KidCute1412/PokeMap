@@ -1,7 +1,7 @@
 import { User, FileText, LogOut, LayoutDashboard } from 'lucide-react';
 // @ts-expect-error
 import milotic from '@/assets/icons/milotic.png';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 import {useState, useEffect} from "react";
 import { toast } from "sonner";
 
@@ -60,8 +60,8 @@ export default function Sidebar() {
             {menuItems.map((item) => {
             const Icon = item.icon;
             return (
-                <a
-                href={item.link}
+                <Link
+                to ={item.link}
                 key={item.label}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors  cursor-pointer ${
                     item.active
@@ -71,7 +71,7 @@ export default function Sidebar() {
                 >
                 <Icon className="w-5 h-5" />
                 <span className="font-medium">{item.label}</span>
-                </a>
+                </Link>
             );
             })}
         </nav>
