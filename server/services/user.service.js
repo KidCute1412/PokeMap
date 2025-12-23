@@ -1,6 +1,8 @@
 import { User } from '../models/user.model.js';
 import moongoose from 'mongoose';
 import speakingURL from "speakingurl"
+
+// ADMIN FUNCTION
 export const getAllUsers = async ({page, limit}) => {
   try {
     const skip = (page - 1) * limit;
@@ -84,8 +86,9 @@ export const restoreUser = async (userId) => {
 }
 
 export const isUserNameExist = async (id, username) => {
-  const userName = await User.findOne({ _id: id });
-
+  const userName = await User.findOne({ _id: id ,
+    bannedAt: { $in: [null, undefined] }
+  });
   return speakingURL(userName.username) === speakingURL(username);
 }
 

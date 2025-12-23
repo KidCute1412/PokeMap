@@ -42,7 +42,12 @@ export default function ProfileHeader({isMiniCard = false, user_id_outside = nul
             setIsLoading(false);
         })
     }, [username_id, user_id_outside, username_outside]);
-
+    if (!userProfile && !isLoading){
+        return (<div className="text-center text-red-500 font-semibold">
+            User profile not found.
+        </div>
+        );
+    }
     return(
         isLoading && !isMiniCard ? <Loading></Loading> :<div className={`${isMiniCard ? 'bg-gray-800/95 backdrop-blur-sm rounded-xl p-4 border border-gray-700/50 shadow-xl' : 'bg-gray-800 rounded-2xl p-8 border-2 border-blue-500 shadow-lg'}`}>
             <div className={`flex justify-between items-start ${isMiniCard ? 'mb-4' : 'mb-6'}`}>

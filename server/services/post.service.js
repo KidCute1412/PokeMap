@@ -1,10 +1,13 @@
 import { Post } from '../models/post.model.js'
 import {Like} from '../models/like.model.js'
 import {Follow} from '../models/follow.model.js'
+import {User} from '../models/user.model.js'
 import { PostWarning } from '../models/postModeration.model.js'
 import sendEmail from '../config/email.config.js';
 import mongoose from 'mongoose';
 import * as notificationService from './notification.service.js';
+
+//  ADMIN FUNCTIONS
 export const getAllPosts = async ({page, limit}) => {
     const skip = (page - 1) * limit;
 
@@ -80,6 +83,7 @@ export const countPosts = async () => {
     return await Post.countDocuments();
 }
 
+// ADMIN FUNCTION
 export const warnPost = async (postId, warningType, description, warnedBy) => {
     // Find the post
     const post = await Post.findById(postId);
@@ -287,13 +291,26 @@ export const getPostsInHome = async ({viewer, limit, exclude_ids}) => {
             $sample: { size: limit }
         },
         {
+            $sort: { createdAt: -1 },
+        }
+        ,
+        {
             $lookup : {
                 from : "users",
                 localField : "user",
                 foreignField : "_id",
-                as : "userInfo"
+                as : "userInfo"         
+            },
+        },
+        {
+            $match: {
+                $or: [
+                    { "userInfo.bannedAt": null },
+                    { "userInfo.bannedAt": { $exists: false } }
+                ]
             }
         },
+        
         {
             $lookup : {
                 from: "comments",
@@ -475,7 +492,6 @@ export const getUserPosts = async ({userId, viewer}) => {
     console.log("getUserPosts called with userId:", userId, "type:", typeof userId);
     const userObjectId = new mongoose.Types.ObjectId(userId);
     console.log("Converted to ObjectId:", userObjectId);
-    
     const userPosts = await Post.aggregate([
         {
             $match: { user:  userObjectId, isDeleted: { $ne: true } }

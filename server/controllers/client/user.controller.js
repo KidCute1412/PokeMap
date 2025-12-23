@@ -7,6 +7,12 @@ export async function getUserProfile (req, res) {
     try{
         const {id, username} = req.query;
         const userProfile = await userService.findUserProfile(id, username);
+        if (!userProfile) {
+            return  res.status(404).json({
+                success: false,
+                message: "User not found"
+            })
+        }
         res.status(200).json({
             success: true,
             message: "User profile fetched successfully",
@@ -79,6 +85,31 @@ export async function changePassword (req, res) {
         res.status(500).json({
             success: false,
             message: e.message || "Server error changing password"
+        })
+    }
+}
+
+export async function isUserBanned (req, res) {
+    try {
+        const {id} = req.query;
+        const user = await User.findById(id).select('bannedAt');
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+        const isBanned = user.bannedAt ? true : false;
+        res.status(200).json({
+            success: true,
+            message: "User ban status fetched successfully",
+            isBanned: isBanned
+        });
+    }
+    catch (e) {
+        res.status(500).json({
+            success: false,
+            message: e.message || "Server error checking user ban status"
         })
     }
 }

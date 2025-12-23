@@ -11,14 +11,31 @@ import {useAuth} from "@/routes/ProtectedRouter.jsx";
 
 
 export default function ProfilePage(){
+    const [isBanned, setIsBanned] = useState(false);
     const {user} = useAuth();
     const {username_id} = useParams();
     const userId = username_id.split("_")[1];
     const isOwnerProfile = userId === user?._id;
 
     const [posts, setPosts] = useState ([]);
-
     useEffect (() => {
+        // Check if user is banned
+        fetch(`${import.meta.env.VITE_API_URL}/api/user/banned?id=${userId}`, {
+            method : "GET",
+            credentials : "include",
+        })
+        .then (res => res.json())
+        .then (data => {
+            setIsBanned(data.isBanned);
+        })
+        .catch (err => {
+            console.error ("Error checking if user is banned:", err);
+        });
+    }, [])
+    useEffect (() => {
+        if (isBanned) {
+            return;
+        }
         fetch (`${import.meta.env.VITE_API_URL}/api/post/get_user_post?userId=${userId}`,
             {
                 method : "GET",
@@ -35,11 +52,22 @@ export default function ProfilePage(){
         .catch (err => {
             console.error ("Error fetching user posts:", err);
         });
-    }, [username_id])
+    }, [username_id, isBanned])
     
     // Memoize posts to prevent unnecessary re-renders
     const memoizedPosts = useMemo(() => posts, [posts.length, posts.map(p => p._id).join(',')]);
     
+    if (isBanned){
+        return (
+            <div className=" pt-20 px-4 ">
+                <div className = " flex flex-col mx-auto w-[80%] ">
+                    <div className="text-center text-red-500 font-semibold mt-10">
+                        This user has been banned and their profile is not accessible.
+                    </div>
+                </div>
+            </div>
+        );
+    }
     return(
         <div className=" pt-20 px-4 ">
             <div className = " flex flex-col mx-auto w-[80%] ">
