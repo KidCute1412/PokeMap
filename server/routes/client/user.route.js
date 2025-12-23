@@ -8,6 +8,8 @@ const router = express.Router();
 router.get("/profile", userController.getUserProfile);
 router.patch("/profile/edit", verifyToken, upload.single("avatar"), userController.editUserProfile);
 router.post("/profile/change-password", verifyToken, userController.changePassword);
+router.get("/profile/follow/list", verifyToken, userController.getFollowList);
 router.get("/banned", userController.isUserBanned);
+router.post("/:userId/follow", verifyToken, userController.followUser); // done
 
 export default router;

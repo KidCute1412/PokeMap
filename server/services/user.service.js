@@ -2,7 +2,7 @@ import { parse } from 'dotenv';
 import { User } from '../models/user.model.js';
 import moongoose from 'mongoose';
 import speakingURL from "speakingurl"
-
+import { Follow } from '../models/follow.model.js';
 // ADMIN FUNCTION
 export const getAllUsers = async ({page, limit, search}) => {
   try {
@@ -202,4 +202,104 @@ export async function updateUserProfile (userId, updateData) {
   ).select('-password');
 
   return updatedUser;
+}
+
+
+export async function getFollowList ({userId, type, currentUserId}){
+  const userObjectId = new moongoose.Types.ObjectId(userId);
+  const currentUserObjectId = currentUserId ? new moongoose.Types.ObjectId(currentUserId) : null;
+
+  const listFollowAggregate = await Follow.aggregate([
+    {
+      $match: type === "followers"
+        ? { following: userObjectId }
+        : { follower: userObjectId }
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: type === "followers" ? "follower" : "following",
+        foreignField: "_id",
+        as: "userInfo"
+      }
+    },
+    {
+      $addFields: {
+        userInfo: { $arrayElemAt: ["$userInfo", 0] }
+      }
+    },
+    // Check if currentUser is following each user in the list
+    {
+      $lookup: {
+        from: "follows",
+        let: { targetUserId: type === "followers" ? "$follower" : "$following" },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ["$follower", currentUserObjectId] },
+                  { $eq: ["$following", "$$targetUserId"] }
+                ]
+              }
+            }
+          },
+          {
+            $project: { _id: 1 }
+          }
+        ],
+        as: "isFollowingByCurrentUser"
+      }
+    },
+    {
+      $addFields: {
+        isFollowedByCurrentUser: {
+          $cond: [
+            { $gt: [{ $size: "$isFollowingByCurrentUser" }, 0] },
+            true,
+            false
+          ]
+        }
+      }
+    },
+    {
+      $project: {
+        isFollowingByCurrentUser: 0
+      }
+    }
+  ]);
+
+  return listFollowAggregate;
+}
+
+
+export async function followUser ({targetUserId, currentUserId}) {
+  try{
+    if (targetUserId.toString() === currentUserId.toString()) {
+        return null;
+    }
+    const existingFollow = await Follow.findOne({
+        follower: currentUserId,
+        following: targetUserId
+    });
+    if (existingFollow) {
+        // Unfollow
+        await Follow.deleteOne({
+            _id: existingFollow._id
+        });
+        return { action: "unfollowed" };
+    }
+    else {
+        // Follow
+        const newFollow = new Follow({
+            follower: currentUserId,
+            following: targetUserId
+        });
+        await newFollow.save();
+        return { action: "followed", isFollowing: true };
+    }
+  }
+  catch(error){
+    return null;
+  }
 }

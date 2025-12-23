@@ -5,7 +5,7 @@ import {Link} from "react-router-dom";
 import {cn} from "@/lib/utils.js"
 import { useState, useRef, useEffect } from "react";
 import MiniProfileAuthor from "./MiniProfileAuthor.jsx";
-import { Edit, Trash2, RotateCcw } from "lucide-react";
+import { Edit, Trash2, RotateCcw, Sparkles } from "lucide-react";
 export default function ContentPostCard ({data, setData, handleImageClick, isOwnerProfile, className, onEditClick, onDeleteClick, onRecoverClick}){ {
     const [isExpanded, setIsExpanded] = useState(false);
     const [needsExpansion, setNeedsExpansion] = useState(false);
@@ -30,14 +30,14 @@ export default function ContentPostCard ({data, setData, handleImageClick, isOwn
                             {data.avatar ? (<img 
                                 src={data.avatar || ""} 
                                 alt={data.username || "User Avatar"}
-                                className="w-16 h-16 rounded-full border-4 object-cover border-blue-400 hover:scale-105 hover:shadow-[0px_5px_10px] hover:shadow-blue-500 cursor-pointer transition-transform duration-300  "
+                                className="w-16 h-16 rounded-full border-4 object-cover border-purple-500 hover:scale-105 hover:shadow-[0px_5px_10px] hover:shadow-purple-500 cursor-pointer transition-transform duration-300  "
                             />) :
-                            (<div className="w-16 h-16 rounded-full bg-gray-400 flex items-center justify-center text-white text-2xl font-bold border-4 border-blue-400 hover:scale-105 hover:shadow-[0px_5px_10px] hover:shadow-blue-500 cursor-pointer transition-transform duration-300">
+                            (<div className="w-16 h-16 rounded-full bg-gray-400 flex items-center justify-center text-white text-2xl font-bold border-4 border-purple-400 hover:scale-105 hover:shadow-[0px_5px_10px] hover:shadow-purple-500 cursor-pointer transition-transform duration-300">
                                 {data.username ? data.username.charAt(0).toUpperCase() : "U"}
                             </div>)
                             }
-                            <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-                                <span className="text-white text-xs">✦</span>
+                            <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-rose-500/80 rounded-full flex items-center justify-center">
+                                <Sparkles className="text-white w-3 h-3" />
                             </div>
                         </Link>
 

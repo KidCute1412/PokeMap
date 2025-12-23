@@ -1,6 +1,6 @@
 import ShortcutToMap from "@/components/common/ShortcutToMap";
 import Posts from "@/pages/client/Posts/Posts";
-import {useState, useEffect, useMemo} from "react";
+import {useState, useEffect} from "react";
 import {useParams} from "react-router-dom";
 import ProfileHeader from "@/pages/client/Profile/components/ProfileHeader.jsx";
 import { FileText, Archive } from "lucide-react";

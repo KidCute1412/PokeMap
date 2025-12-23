@@ -17,7 +17,7 @@ import ProtectedRouter from "@/routes/ProtectedRouter.jsx";
 import AdminProtectedRouter from "@/routes/AdminProtectedRouter.jsx";
 import EditProfile from "@/pages/client/Profile/components/EditProfile";
 import ChangePassword from "@/pages/client/Profile/components/ChangePassword";
-
+import FollowPage from "@/pages/client/Profile/components/FollowPage.jsx";
 // Admin Auth Pages
 import AdminLoginPage from "@/pages/admin/auth/AdminLoginPage.jsx";
 import AdminRegisterPage from "@/pages/admin/auth/AdminRegisterPage.jsx";
@@ -55,6 +55,11 @@ const routers = createBrowserRouter([
                 path: "profile/edit/",
                 element: <EditProfile></EditProfile>
             },
+            {
+                path: "profile/:username_id/follow",
+                element: <FollowPage></FollowPage>
+            }
+            ,
             {
                 path: "profile/change-password",
                 element: <ChangePassword></ChangePassword>

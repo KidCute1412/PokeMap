@@ -1,8 +1,9 @@
 import {useEffect, useState} from "react";
 import {useAuth} from "@/routes/ProtectedRouter.jsx";
-import {useParams, useNavigate} from "react-router-dom";
+import {useParams, useNavigate, Link} from "react-router-dom";
 import Loading from "@/components/common/ClientLoading";
-import { Archive } from "lucide-react";
+import { Sparkles } from "lucide-react";
+
 
 export default function ProfileHeader({isMiniCard = false, user_id_outside = null, username_outside = null}){
 
@@ -73,7 +74,8 @@ export default function ProfileHeader({isMiniCard = false, user_id_outside = nul
                     
                     </div>
                     {/* Stats */}
-                    <div className={`flex ${isMiniCard ? 'space-x-6' : 'space-x-12'}`}>
+                    <Link to = {isMiniCard ? "/#" : `/profile/${userProfile?.username}_${userProfile?._id}/follow`} 
+                    className={`flex ${isMiniCard ? 'space-x-6' : 'space-x-12'}`}>
                         <div>
                             <h3 className={`${isMiniCard ? 'text-white text-sm font-semibold mb-0.5' : 'text-white text-xl font-bold mb-1'}`}>Followers</h3>
                             <p className={`${isMiniCard ? 'text-white text-lg font-bold' : 'text-white text-2xl font-bold'}`}>{userProfile?.profile?.followers}</p>
@@ -82,12 +84,12 @@ export default function ProfileHeader({isMiniCard = false, user_id_outside = nul
                             <h3 className={`${isMiniCard ? 'text-white text-sm font-semibold mb-0.5' : 'text-white text-xl font-bold mb-1'}`}>Following</h3>
                             <p className={`${isMiniCard ? 'text-white text-lg font-bold' : 'text-white text-2xl font-bold'}`}>{userProfile?.profile?.following}</p>
                         </div>
-                    </div>
+                    </Link>
                 </div>
                 
                 {/* Right side - Profile picture */}
                 <div className={`relative ${isMiniCard ? 'ml-4' : 'ml-8'}`}>
-                    <div className={`${isMiniCard ? 'w-16 h-16' : 'w-24 h-24'} rounded-full bg-gradient-to-r from-blue-400 to-blue-600 p-1`}>
+                    <div className={`${isMiniCard ? 'w-16 h-16' : 'w-24 h-24'} rounded-full bg-gradient-to-r from-purple-400 to-rose-600 p-1`}>
                         {(userProfile && userProfile.profile && userProfile.profile.avatar) ? (
                         <img 
                             src={userProfile?.profile?.avatar} 
@@ -101,8 +103,8 @@ export default function ProfileHeader({isMiniCard = false, user_id_outside = nul
                         }
                     </div>
                     {/* Star decoration */}
-                    <div className={`absolute -top-2 -right-2 ${isMiniCard ? 'w-5 h-5' : 'w-8 h-8'} bg-blue-500 rounded-full flex items-center justify-center`}>
-                        <span className={`text-white ${isMiniCard ? 'text-xs' : 'text-sm'}`}>✦</span>
+                    <div className={`absolute -top-2 -right-2 ${isMiniCard ? 'w-5 h-5' : 'w-8 h-8'} bg-rose-500 rounded-full flex items-center justify-center`}>
+                        <Sparkles className={`text-white ${isMiniCard ? 'w-3 h-3' : 'w-4 h-4'}`} />
                     </div>
                 </div>
             </div>

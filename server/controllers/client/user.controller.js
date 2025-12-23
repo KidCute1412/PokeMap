@@ -113,3 +113,48 @@ export async function isUserBanned (req, res) {
         })
     }
 }
+
+
+
+export async function getFollowList (req, res) {
+    try{
+        const { userId, type } = req.query;
+        const currentUserId = req.user ? req.user.id : null;
+        const followList = await userService.getFollowList ({ userId, type, currentUserId });
+        res.status(200).json({
+            success: true,
+            message: "Follow list fetched successfully",
+            data: followList
+        });
+    }
+    catch(error){
+        res.status(500).json({
+            success: false,
+            message: error.message || "Server error fetching follow list"
+        });
+    }
+
+}
+export async function followUser (req, res) {
+    try {
+        const targetUserId = req.params.userId;
+        const currentUserId = req.user.id;
+        const result = await userService.followUser ({ targetUserId, currentUserId });
+        if (!result){
+            return res.status(400).json({
+                success: false,
+                message: "Failed to follow/unfollow user"
+            });
+        }
+        res.status(200).json({
+            success: true,
+            message: result.isFollowing ? "User followed successfully" : "User unfollowed successfully",
+        });
+    }
+    catch (e) {
+        res.status(500).json({
+            success: false,
+            message: e.message || "Server error following/unfollowing user"
+        })
+    }
+}
