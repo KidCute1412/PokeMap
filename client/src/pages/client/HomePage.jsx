@@ -52,7 +52,7 @@
                 setTimeout(() => {
                     setLoading(false);
                     isFetchingRef.current = false;
-                }, 1000);
+                }, 3000);
                 
             });
         }, [newPostsObserver.isIntersecting, loading, hasMore, usedPostsIds]);
@@ -60,13 +60,13 @@
         // Memoize posts to prevent unnecessary re-renders
         const memoizedPosts = useMemo(() => posts, [posts.length, posts.map(p => p._id).join(',')]);
         
-        if (posts.length === 0 && !hasMore) return <Loading></Loading>;
+        if (posts.length === 0 && !hasMore) return <Loading text = {"Pikachu..."}></Loading>;
         return(
             <div className="min-h-screen pt-20 px-4">
                 <div className = "w-[60%] ml-[100px] items-start">
                     <Posts isOwnerProfile = {false} posts = {memoizedPosts}></Posts>
                     <div className = "py-10" ref = {newPostsObserver.ref} ></div>
-                    {loading && hasMore && <Loading className = "static  bg-transparent"></Loading>}
+                    {loading && hasMore && <Loading className = "static  bg-transparent" text = "Pikachu..."></Loading>}
                     {!hasMore && <div className="text-center text-white font-semibold py-4">No more posts to load.</div>}
                 </div>
                 <DragonModel></DragonModel>

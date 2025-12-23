@@ -4,21 +4,27 @@ import mongoose from 'mongoose';
 
 export const searchUsers = async (keyword, { page = 1, limit = 10 }) => {
     const skip = (page - 1) * limit;
+
     
-    const searchRegex = new RegExp(keyword, 'i');
-    
-    const users = await User.aggregate([
+    const usersAggregate = await User.aggregate([
+        {
+            $search: {
+                index: "user_search_index",
+                text: {
+                    query: keyword,
+                    path: ["username", "description"],
+                    fuzzy: { maxEdits: 1}
+            }
+        }
+        },
         {
             $match: {
-                $or: [
-                    { username: { $regex: searchRegex } },
-                    { description: { $regex: searchRegex } }
-                ],
                 $and: [
                     { $or: [{ bannedAt: null }, { bannedAt: { $exists: false } }] }
                 ]
             }
-        },
+        }
+        ,
         {
             $lookup: {
                 from: "follows",
@@ -52,24 +58,22 @@ export const searchUsers = async (keyword, { page = 1, limit = 10 }) => {
                 createdAt: 1
             }
         },
-        { $skip: skip },
-        { $limit: limit }
+        {
+            $facet: {
+                users: [
+                    { $skip: skip },
+                    { $limit: limit }
+                ],
+                totals: [
+                    { $count: "count" }
+                ]
+            }
+
+        }
     ]);
 
-    const total = await User.countDocuments({
-        $and: [
-            {
-                $or: [
-                    { username: { $regex: searchRegex } },
-                    { description: { $regex: searchRegex } }
-                ]
-            },
-            {
-                $or: [{ bannedAt: null }, { bannedAt: { $exists: false } }]
-            }
-        ]
-    });
-
+    const users = usersAggregate[0].users;
+    const total = usersAggregate[0].totals[0]?.count || 0;
     return {
         users,
         total,
@@ -80,16 +84,26 @@ export const searchUsers = async (keyword, { page = 1, limit = 10 }) => {
 
 export const searchPosts = async (keyword, { page = 1, limit = 10 }) => {
     const skip = (page - 1) * limit;
+
     
-    const searchRegex = new RegExp(keyword, 'i');
-    
-    const posts = await Post.aggregate([
+    const aggregationResult = await Post.aggregate([
+        {
+            $search: {
+                index: "post_search_index",
+                text: {
+                    query: keyword,
+                    path: "content",
+                    fuzzy: { maxEdits: 1}
+                }
+            }
+        }
+        ,
         {
             $match: {
-                content: { $regex: searchRegex },
                 isDeleted: { $ne: true }
             }
-        },
+        }
+        ,
         {
             $sort: { createdAt: -1 }
         },
@@ -139,14 +153,21 @@ export const searchPosts = async (keyword, { page = 1, limit = 10 }) => {
                 createdAt: 1
             }
         },
-        { $skip: skip },
-        { $limit: limit }
+        {
+            $facet: {
+                posts: [
+                    { $skip: skip },
+                    { $limit: limit }
+                ],
+                total: [
+                    { $count: "count" }
+                ]
+            }
+        }
     ]);
 
-    const total = await Post.countDocuments({
-        content: { $regex: searchRegex },
-        isDeleted: { $ne: true }
-    });
+    const posts = aggregationResult[0].posts;
+    const total = aggregationResult[0].total[0]?.count || 0;
 
     return {
         posts,
@@ -157,114 +178,14 @@ export const searchPosts = async (keyword, { page = 1, limit = 10 }) => {
 };
 
 export const searchAll = async (keyword, { userLimit = 5, postLimit = 5 }) => {
-    const searchRegex = new RegExp(keyword, 'i');
-    
-    // Search users
-    const users = await User.aggregate([
-        {
-            $match: {
-                $or: [
-                    { username: { $regex: searchRegex } },
-                    { description: { $regex: searchRegex } }
-                ],
-                $and: [
-                    { $or: [{ bannedAt: null }, { bannedAt: { $exists: false } }] }
-                ]
-            }
-        },
-        {
-            $lookup: {
-                from: "follows",
-                localField: "_id",
-                foreignField: "following",
-                as: "followersList"
-            }
-        },
-        {
-            $addFields: {
-                'profile.followers': { $size: "$followersList" }
-            }
-        },
-        {
-            $project: {
-                _id: 1,
-                username: 1,
-                description: 1,
-                'profile.avatar': 1,
-                'profile.followers': 1
-            }
-        },
-        { $limit: userLimit }
-    ]);
+    const usersPromise = searchUsers(keyword, { page: 1, limit: userLimit });
+    const postsPromise = searchPosts(keyword, { page: 1, limit: postLimit });
+    const [usersResult, postsResult] = await Promise.all([usersPromise, postsPromise]);
 
-    // Search posts
-    const posts = await Post.aggregate([
-        {
-            $match: {
-                content: { $regex: searchRegex },
-                isDeleted: { $ne: true }
-            }
-        },
-        {
-            $sort: { createdAt: -1 }
-        },
-        {
-            $lookup: {
-                from: "users",
-                localField: "user",
-                foreignField: "_id",
-                as: "userInfo"
-            }
-        },
-        {
-            $lookup: {
-                from: "likes",
-                localField: "_id",
-                foreignField: "post",
-                as: "likes"
-            }
-        },
-        {
-            $addFields: {
-                username: { $arrayElemAt: ["$userInfo.username", 0] },
-                avatar: { $arrayElemAt: ["$userInfo.profile.avatar", 0] },
-                userId: { $arrayElemAt: ["$userInfo._id", 0] },
-                likesCount: { $size: "$likes" }
-            }
-        },
-        {
-            $project: {
-                _id: 1,
-                content: 1,
-                images: 1,
-                username: 1,
-                avatar: 1,
-                userId: 1,
-                likesCount: 1,
-                createdAt: 1
-            }
-        },
-        { $limit: postLimit }
-    ]);
-
-    const totalUsers = await User.countDocuments({
-        $and: [
-            {
-                $or: [
-                    { username: { $regex: searchRegex } },
-                    { description: { $regex: searchRegex } }
-                ]
-            },
-            {
-                $or: [{ bannedAt: null }, { bannedAt: { $exists: false } }]
-            }
-        ]
-    });
-
-    const totalPosts = await Post.countDocuments({
-        content: { $regex: searchRegex },
-        isDeleted: { $ne: true }
-    });
+    const users = usersResult.users;
+    const posts = postsResult.posts;
+    const totalUsers = usersResult.total;
+    const totalPosts = postsResult.total;
 
     return {
         users,

@@ -180,3 +180,10 @@ body {
 .leaflet-map-pane {
   background: transparent !important;
 }
+
+
+.logo-hover:hover {
+  animation: tada;
+  animation-duration: 1.5s;
+  animation-iteration-count: 1;
+}

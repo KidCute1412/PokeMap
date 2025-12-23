@@ -89,7 +89,7 @@ export default function PostPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-900 pt-20 px-4">
+        <div className="min-h-screen pt-20 px-4">
             <div className="max-w-6xl mx-auto">
                 {/* Back button */}
                 <button

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
+import { Heart, MessageCircle, Search } from "lucide-react";
 import speakingurl from "speakingurl";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
@@ -10,7 +11,7 @@ export default function SearchPage() {
     const query = searchParams.get("q") || "";
     const initialTab = searchParams.get("tab") || "all";
 
-    const [keyword, setKeyword] = useState(query);
+
     const [activeTab, setActiveTab] = useState(initialTab);
     const [users, setUsers] = useState([]);
     const [posts, setPosts] = useState([]);
@@ -25,7 +26,7 @@ export default function SearchPage() {
 
     useEffect(() => {
         if (query) {
-            setKeyword(query);
+
             fetchResults(query);
         }
     }, [query]);
@@ -85,13 +86,6 @@ export default function SearchPage() {
         }
     };
 
-    const handleSearch = (e) => {
-        e.preventDefault();
-        if (keyword.trim()) {
-            navigate(`/search?q=${encodeURIComponent(keyword.trim())}&tab=${activeTab}`);
-            fetchResults(keyword.trim());
-        }
-    };
 
     const handleTabChange = (tab) => {
         setActiveTab(tab);
@@ -144,26 +138,9 @@ export default function SearchPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-900 pt-20 px-4">
+        <div className="min-h-screen pt-20 px-4">
             <div className="max-w-4xl mx-auto">
-                {/* Search Header */}
-                <div className="mb-6">
-                    <form onSubmit={handleSearch} className="flex gap-2">
-                        <input
-                            type="text"
-                            placeholder="Search users, posts..."
-                            className="flex-1 bg-gray-800 text-white placeholder-gray-400 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
-                            value={keyword}
-                            onChange={(e) => setKeyword(e.target.value)}
-                        />
-                        <button
-                            type="submit"
-                            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
-                        >
-                            Search
-                        </button>
-                    </form>
-                </div>
+
 
                 {/* Results count */}
                 {query && (
@@ -228,7 +205,7 @@ export default function SearchPage() {
                                 {users.map((user) => (
                                     <div
                                         key={user._id}
-                                        className="flex items-center gap-4 p-4 bg-gray-800 rounded-lg hover:bg-gray-700 cursor-pointer transition-colors"
+                                        className="flex items-center gap-4 p-4 bg-black/70 rounded-lg hover:bg-black/90 cursor-pointer transition-colors"
                                         onClick={() => handleUserClick(user)}
                                     >
                                         <img
@@ -244,9 +221,9 @@ export default function SearchPage() {
                                                 {highlightText(user.username, query)}
                                             </div>
                                             {user.description && (
-                                                <div className="text-gray-400 text-sm line-clamp-2 mt-1">
-                                                    {highlightText(user.description, query)}
-                                                </div>
+                                              
+                                                <div className = "text-white" dangerouslySetInnerHTML={{ __html: highlightText(stripHtml(user.description), query) }}></div>
+                                                    
                                             )}
                                         </div>
                                         <div className="text-right text-gray-500 text-sm">
@@ -294,7 +271,7 @@ export default function SearchPage() {
                                 {posts.map((post) => (
                                     <div
                                         key={post._id}
-                                        className="p-4 bg-gray-800 rounded-lg hover:bg-gray-700 cursor-pointer transition-colors"
+                                        className="p-4 bg-black/70 rounded-lg hover:bg-black/90 cursor-pointer transition-colors"
                                         onClick={() => handlePostClick(post)}
                                     >
                                         <div className="flex items-start gap-3">
@@ -337,10 +314,10 @@ export default function SearchPage() {
                                                 )}
                                                 <div className="flex items-center gap-4 mt-3 text-gray-400 text-sm">
                                                     <span className="flex items-center gap-1">
-                                                        ❤️ {post.likesCount || 0}
+                                                        <Heart className="w-4 h-4" /> {post.likesCount || 0}
                                                     </span>
                                                     <span className="flex items-center gap-1">
-                                                        💬 {post.commentsCount || 0}
+                                                        <MessageCircle className="w-4 h-4" /> {post.commentsCount || 0}
                                                     </span>
                                                 </div>
                                             </div>
@@ -367,19 +344,7 @@ export default function SearchPage() {
                 {/* Empty state */}
                 {!query && (
                     <div className="text-center text-gray-400 py-16">
-                        <svg
-                            className="w-16 h-16 mx-auto mb-4 text-gray-600"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                            />
-                        </svg>
+                        <Search className="w-16 h-16 mx-auto mb-4 text-gray-600" />
                         <p className="text-xl">Start searching for users or posts</p>
                     </div>
                 )}

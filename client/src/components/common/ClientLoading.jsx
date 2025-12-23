@@ -1,6 +1,5 @@
 // @ts-expect-error
 import pikachu from "@/assets/icons/pikachu.jpg";
-import "animate.css";
 import {cn} from "@/lib/utils.js";
 export default function Loading({ src, size = "w-16 h-16", text = "Loading..." , className=""}) {
     if (!src) {

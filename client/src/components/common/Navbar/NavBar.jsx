@@ -26,9 +26,10 @@ function Logo(){
 
     const logoImage = LogoIcon; // Placeholder logo image
     const navigate = useNavigate(); 
+
     return (
-        <div className="flex items-center space-x-2 cursor-pointer" onClick = {() => navigate("/")}>
-            <img src={logoImage} alt="Logo" className="w-[150px] h-[70px] object-cover"/>
+        <div className="flex items-center space-x-2 cursor-pointer group" onClick = {() => navigate("/")}>
+            <img src={logoImage} alt="Logo" className="w-[150px] h-16 object-cover transition-all logo-hover hover:scale-110 duration-500" />
         </div>
     );
 }
