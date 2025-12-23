@@ -1,13 +1,11 @@
 import { X, Send } from 'lucide-react';
 import UploadImage from '@/components/common/UploadImage.jsx';
 import TextEditor from '@/components/common/TextEditor.jsx';
-import { useAuth } from '@/routes/ProtectedRouter.jsx';
 import { useState, useEffect } from 'react';
 import JustValidate from 'just-validate';
 import { toast } from "sonner";
 
 export default function EditPostModal({postData, setPost, onClose }) {
-    const {user} = useAuth();
     const [oldImages, setOldImages] = useState(postData.images || []);
     const [images, setImages] = useState([]);
     const [isSubmitting, setIsSubmitting] = useState(false);

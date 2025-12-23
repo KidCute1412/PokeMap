@@ -487,14 +487,14 @@ export const getUserPostById = async ({postId, userId, viewer}) => {
     return userPostbyId;
 } 
 
-export const getUserPosts = async ({userId, viewer}) => {
+export const getUserPosts = async ({userId, viewer, isDeleted}) => {
     
     console.log("getUserPosts called with userId:", userId, "type:", typeof userId);
     const userObjectId = new mongoose.Types.ObjectId(userId);
     console.log("Converted to ObjectId:", userObjectId);
     const userPosts = await Post.aggregate([
         {
-            $match: { user:  userObjectId, isDeleted: { $ne: true } }
+            $match: { user:  userObjectId, isDeleted: isDeleted ? true : { $ne: true } }
         },
         {
             $sort: { createdAt: -1 },

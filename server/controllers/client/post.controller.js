@@ -99,7 +99,8 @@ export const getPostsInHome = async (req, res) => {
 
 export const getUserPosts = async (req, res) => {
     const viewer = req.user || null;
-    const results = await postService.getUserPosts ({userId : req.query.userId, viewer : viewer});
+
+    const results = await postService.getUserPosts ({userId : req.query.userId, viewer : viewer, isDeleted : req.query.isDeleted === "true" ? true : false});
     res.json ({
         status : "success",
         message : "User posts fetched successfully",
@@ -165,9 +166,36 @@ export const getCommentReplies = async (req, res) => {
     }
 };
 
-export const deletePost = (req, res) => {
+export const deletePost = async(req, res) => {
     // Your logic here
-    res.json({ message: "Delete post" });
+    const postId = req.body.postId;
+    const userId = req.user._id;
+    //  Check is owner of the post
+    const owner = await postService.findAuthorByPostId(postId);
+    if (owner._id.toString() !== userId.toString()) {
+        return res.status(403).json({ message: "You are not authorized to delete this post" });
+    }
+    // Soft delete the post
+    await postService.deletePost(postId);
+    res.json({ message: "Delete post",
+        postId: postId
+     });
+}
+
+export const recoverPost = async(req, res) => {
+    // Your logic here
+    const postId = req.body.postId;
+    const userId = req.user._id;
+    //  Check is owner of the post
+    const owner = await postService.findAuthorByPostId(postId);
+    if (owner._id.toString() !== userId.toString()) {
+        return res.status(403).json({ message: "You are not authorized to recover this post" });
+    }
+    // Recover the post
+    await postService.recoverPost(postId);
+    res.json({ message: "Post recovered successfully",
+        postId: postId
+     });
 }
 
 export const followUserFromPost = async (req, res) => {

@@ -5,8 +5,8 @@ import {Link} from "react-router-dom";
 import {cn} from "@/lib/utils.js"
 import { useState, useRef, useEffect } from "react";
 import MiniProfileAuthor from "./MiniProfileAuthor.jsx";
-import { Edit } from "lucide-react";
-export default function ContentPostCard ({data, setData, handleImageClick, isOwnerProfile, className, onEditClick}) {
+import { Edit, Trash2, RotateCcw } from "lucide-react";
+export default function ContentPostCard ({data, setData, handleImageClick, isOwnerProfile, className, onEditClick, onDeleteClick, onRecoverClick}){ {
     const [isExpanded, setIsExpanded] = useState(false);
     const [needsExpansion, setNeedsExpansion] = useState(false);
     const contentRef = useRef(null);
@@ -57,9 +57,10 @@ export default function ContentPostCard ({data, setData, handleImageClick, isOwn
                 </div>
                 {/* Follow button and Edit button */}
                 <div className="flex items-center space-x-2">
-                    <FollowButton isFollowing = {data.isFollowing} setIsFollowing = {setData}
-                     postId = {data._id}></FollowButton>
+                    {!isOwnerProfile && <FollowButton isFollowing = {data.isFollowing} setIsFollowing = {setData}
+                     postId = {data._id}></FollowButton>}
                     {isOwnerProfile && (
+                        <>
                         <button
                             onClick={(e) => {
                                 e.stopPropagation();
@@ -70,6 +71,30 @@ export default function ContentPostCard ({data, setData, handleImageClick, isOwn
                         >
                             <Edit className="w-4 h-4" />
                         </button>
+                        {!data.isDeleted ?
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onDeleteClick();
+                                }}
+                                className="p-2 bg-red-700/50 hover:bg-red-500 rounded-full text-white transition-colors duration-200"
+                                title="Delete post"
+                            >
+                                <Trash2 className="w-4 h-4" />
+                            </button>
+                        :
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onRecoverClick();
+                                }}
+                                className="p-2 bg-green-700/50 hover:bg-green-500 rounded-full text-white transition-colors duration-200"
+                                title="Recover post"
+                            >
+                                <RotateCcw className="w-4 h-4" />
+                            </button>
+                        }
+                        </>
                     )}
                 </div>
                 
@@ -143,4 +168,4 @@ export default function ContentPostCard ({data, setData, handleImageClick, isOwn
             </div>
         </>
     );
-}
+}}

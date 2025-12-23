@@ -9,4 +9,5 @@ router.get("/profile", userController.getUserProfile);
 router.patch("/profile/edit", verifyToken, upload.single("avatar"), userController.editUserProfile);
 router.post("/profile/change-password", verifyToken, userController.changePassword);
 router.get("/banned", userController.isUserBanned);
+
 export default router;

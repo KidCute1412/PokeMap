@@ -1,9 +1,11 @@
-import { useState, memo}from "react";
+import { useState, memo, useEffect}from "react";
 
 import ContentPostCard from "./ContentPostCard.jsx";
 import PostDetailModal from "./PostDetailModal";
 import ImageDetailModal from "../../Posts/components/ImageDetailModal";   
 import PostEditModal from "./PostEditModal.jsx";
+import PostDeleteModal from "./PostDeleteModal.jsx";
+import PostRecoverModal from "./PostRecoverModal.jsx";
 import useIntersectionObserver from "@/hooks/useIntersectionObserver.jsx";
 
 
@@ -13,9 +15,14 @@ import useIntersectionObserver from "@/hooks/useIntersectionObserver.jsx";
 
 const PostCard = memo (function PostCard({data, isOwnerProfile = false}) {
     const [post, setPost] = useState (data);
+    useEffect (() => {
+        setPost(data);
+    }, [data]);
     const [showPostDetail, setShowPostDetail] = useState(false);
     const [showImageDetail, setShowImageDetail] = useState(false); 
-    const [showEditModal, setShowEditModal] = useState(false);    
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);  
+    const [showRecoverModal, setShowRecoverModal] = useState(false);
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const imageObserver = useIntersectionObserver({ threshold: 0.1 });
     const handleImageClick = (index) => {
@@ -30,14 +37,22 @@ const PostCard = memo (function PostCard({data, isOwnerProfile = false}) {
     const handleEditClick = () => {
         setShowEditModal(true);
     }
+    const handleDeleteClick = () => {
+        setShowDeleteModal(true);
+    }
 
-
+    const handleRecoverClick = () => {
+        setShowRecoverModal(true);
+    }
+    if (!post){
+        return null;
+    }
     return (
         <>
             <div ref = {imageObserver.ref} className={`bg-gray-800/70 rounded-2xl p-6 mb-6 shadow-lg border border-gray-700 cursor-pointer hover:bg-gray-750 transition-colors
                  ${imageObserver.hasIntersected ? "animate__animated animate__fadeInUp" : ""}`} onClick={handlePostClick}>
                 {imageObserver.hasIntersected && (
-                    <ContentPostCard data={post} setData = {setPost} handleImageClick={handleImageClick} isOwnerProfile = {isOwnerProfile} onEditClick={handleEditClick} />
+                    <ContentPostCard key={post._id} data={post} setData = {setPost} handleImageClick={handleImageClick} isOwnerProfile = {isOwnerProfile} onEditClick={handleEditClick} onDeleteClick = {handleDeleteClick} onRecoverClick = {handleRecoverClick}/>
                 )}
             </div>      
 
@@ -68,6 +83,23 @@ const PostCard = memo (function PostCard({data, isOwnerProfile = false}) {
                     onClose={() => setShowEditModal(false)}
                 />
             )}
+            {/* Delete Modal */}
+            {showDeleteModal && (
+                <PostDeleteModal
+                    postData={post}
+                    setPost={setPost}
+                    onClose ={() => setShowDeleteModal(false)}
+                />
+            )}
+            {/* Recover Modal */}
+            {showRecoverModal && (
+                <PostRecoverModal
+                    postData={post}
+                    setPost={setPost}
+                    onClose ={() => setShowRecoverModal(false)}
+                />
+            )}
+
     </>
     );
 })

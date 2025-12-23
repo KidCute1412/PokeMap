@@ -19,7 +19,8 @@ route.get("/:postId/detail", justDecodeToken, postController.getPostDetail);
 route.get("/:postId/comments", postController.getPostComments);
 route.get("/comments/:commentId/replies", postController.getCommentReplies);
 
-route.delete("/:postId", postController.deletePost);
+route.delete("/delete", verifyToken, postController.deletePost);
+route.patch("/recover", verifyToken, postController.recoverPost);
 route.post("/:postId/follow", verifyToken, postController.followUserFromPost); // done (remove author follow himself later)
 
 

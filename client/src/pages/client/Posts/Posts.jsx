@@ -1,15 +1,16 @@
 import PostCard from "@/pages/client/Posts/components/PostCard.jsx";
 import CreatePostModal from "./components/CreatePostModal";
 import {useState, memo} from "react";
+import { Archive } from "lucide-react";
 
-const Posts = memo(function Posts({isOwnerProfile = false, posts = [], setPosts}) {
+const Posts = memo(function Posts({isOwnerProfile = false, posts = [], setPosts, activeTab = "all"}) {
     const [openCreatePostModal, setOpenCreatePostModal] = useState(false);
 
     return(
         <div className="max-w-full px-2 py-2 rounded-2xl">
 
 
-            {isOwnerProfile && (
+            {isOwnerProfile && activeTab === "all" && (
                 <div className="mb-6">
                     <button
                         onClick={() => {setOpenCreatePostModal(true);}}
@@ -20,13 +21,32 @@ const Posts = memo(function Posts({isOwnerProfile = false, posts = [], setPosts}
                     </button>
                 </div>
             )}
-            {posts.map(post => (
+            {/* Posts List */}
+            {activeTab === "all" && posts.map(post => (
                 <PostCard
                     key={post._id}
                     data = {post}
                     isOwnerProfile={isOwnerProfile}
                 />
             ))}
+
+            {activeTab === "deleted" && (
+                posts.length === 0 ? (
+                    <div className="text-center text-gray-400 font-medium mt-10">
+                        <Archive className="w-8 h-8 mx-auto mb-4" />
+                        No deleted posts to show.
+                    </div>
+                ) : (
+                    posts.map(post => (
+                        <PostCard
+                            key={post._id}
+                            data = {post}
+                            isOwnerProfile={isOwnerProfile}
+                        />
+                    ))
+                )
+            )
+            }
 
             {openCreatePostModal && (
                 <div className="fixed inset-0 flex items-center justify-center z-50">

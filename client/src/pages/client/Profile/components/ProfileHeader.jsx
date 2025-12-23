@@ -2,6 +2,7 @@ import {useEffect, useState} from "react";
 import {useAuth} from "@/routes/ProtectedRouter.jsx";
 import {useParams, useNavigate} from "react-router-dom";
 import Loading from "@/components/common/ClientLoading";
+import { Archive } from "lucide-react";
 
 export default function ProfileHeader({isMiniCard = false, user_id_outside = null, username_outside = null}){
 
@@ -130,10 +131,17 @@ export default function ProfileHeader({isMiniCard = false, user_id_outside = nul
             </div>
             )}
 
-            {/* Edit Profile Button - chỉ hiển thị khi không phải mini card và là owner */}
-            {isOwnerProfile && !isMiniCard && <button onClick = {() => {navigate(`/profile/edit`)}} className="w-full bg-purple-600 hover:bg-purple-700 text-white text-xl font-semibold py-4 rounded-2xl transition-colors cursor-pointer">
-                Edit Profile
-            </button>}
+            {/* Action Buttons - chỉ hiển thị khi không phải mini card và là owner */}
+            {isOwnerProfile && !isMiniCard && (
+                <div className="flex gap-3">
+                    <button
+                        onClick={() => {navigate(`/profile/edit`)}}
+                        className="flex-1 bg-purple-600 hover:bg-purple-700 text-white text-xl font-semibold py-4 rounded-2xl transition-colors cursor-pointer"
+                    >
+                        Edit Profile
+                    </button>
+                </div>
+            )}
         </div>
     );
 }
