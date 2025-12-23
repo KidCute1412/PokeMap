@@ -104,7 +104,7 @@ const PostManagementDashboard = () => {
 
         {/* Search Bar */}
         <div className="mb-6">
-          <SearchInput labelName={"Seach Posts"} placeHolder={"Seach by content of posts"} searchQuery = {searchQuery} setSearchQuery={setSearchQuery} setSubmitSearchQuery = {setSubmitSearchQuery} setPage = {setCurrentPage}></SearchInput>
+          <SearchInput labelName={"Search Posts"} placeHolder={"Search by content of posts"} searchQuery = {searchQuery} setSearchQuery={setSearchQuery} setSubmitSearchQuery = {setSubmitSearchQuery} setPage = {setCurrentPage}></SearchInput>
         </div>
 
         {/* Posts Table */}
