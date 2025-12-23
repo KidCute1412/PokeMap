@@ -1,11 +1,13 @@
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import {Eye, Trash2, RotateCcw} from "lucide-react";
 import UserDetailModal from '@/pages/admin/users/components/UserDetailModal';
 import DeleteConfirmModal from '@/pages/admin/users/components/UserDeleteModal';
 import UserRestoreModal from '@/pages/admin/users/components/UserRestoreModal';
 export default function UserLine ({userInfo}) {
-
     const [user, setUser ] = useState(userInfo);
+    useEffect (() => {
+        setUser (userInfo);
+    }, [userInfo])
     const [openDetailModal, setOpenDetailModal] = useState(false);
     const [openRestoreModal, setOpenRestoreModal] = useState (false);
     const [openDeleteModal, setOpenDeleteModal] = useState (false);

@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import {Eye, AlertCircle, Trash2, RotateCcw } from "lucide-react";
 import PostDetailModal from "@/pages/admin/posts/components/PostDetailModal";
 import WarnModal from "@/pages/admin/posts/components/WarnModal";
@@ -6,6 +6,9 @@ import DeleteModal from "@/pages/admin/posts/components/DeleteModal";
 import RecoverModal from "@/pages/admin/posts/components/RecoverModal";
 export default function PostLine ({postInfo}) {
     const [post, setPost] = useState(postInfo);
+    useEffect (() => {
+        setPost (postInfo);
+    }, [postInfo]);
     const [openDetailPost, setOpenDetailPost] = useState(null);
     const [openWarnPost, setOpenWarnPost] = useState(null);
     const [openDeletePost, setOpenDeletePost] = useState(null);

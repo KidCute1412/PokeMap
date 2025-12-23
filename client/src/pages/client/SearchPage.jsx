@@ -208,14 +208,17 @@ export default function SearchPage() {
                                         className="flex items-center gap-4 p-4 bg-black/70 rounded-lg hover:bg-black/90 cursor-pointer transition-colors"
                                         onClick={() => handleUserClick(user)}
                                     >
-                                        <img
-                                            src={user.profile?.avatar || "/default-avatar.png"}
-                                            alt={user.username}
-                                            className="w-14 h-14 rounded-full object-cover bg-gray-600"
-                                            onError={(e) => {
-                                                e.target.src = "/default-avatar.png";
-                                            }}
-                                        />
+                                        {user.profile?.avatar ? (
+                                            <img
+                                                src={user.profile.avatar}
+                                                alt={user.username}
+                                                className="w-16 h-16 rounded-full object-cover bg-gray-600 flex-shrink-0"
+                                            ></img>
+                                        ) : (
+                                            <div className="w-16 h-16 rounded-full bg-gray-400 flex items-center justify-center text-white text-2xl font-bold flex-shrink-0">
+                                                {user.username.charAt(0).toUpperCase()}
+                                            </div>
+                                        )}
                                         <div className="flex-1 min-w-0">
                                             <div className="text-white font-semibold text-lg">
                                                 {highlightText(user.username, query)}
@@ -275,14 +278,19 @@ export default function SearchPage() {
                                         onClick={() => handlePostClick(post)}
                                     >
                                         <div className="flex items-start gap-3">
-                                            <img
-                                                src={post.avatar || "/default-avatar.png"}
-                                                alt={post.username}
-                                                className="w-10 h-10 rounded-full object-cover bg-gray-600 flex-shrink-0"
-                                                onError={(e) => {
-                                                    e.target.src = "/default-avatar.png";
-                                                }}
-                                            />
+                                            {post.avatar ? 
+                                            (
+                                                <img
+                                                    src={post.avatar}
+                                                    alt={post.username}
+                                                    className="w-12 h-12 rounded-full object-cover bg-gray-600 flex-shrink-0"
+                                                ></img>
+                                            ) : (
+                                                <div className="w-12 h-12 rounded-full bg-gray-400 flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
+                                                    {post.username.charAt(0).toUpperCase()}
+                                                </div>
+                                            )
+                                            }
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center gap-2">
                                                     <span className="text-white font-medium">

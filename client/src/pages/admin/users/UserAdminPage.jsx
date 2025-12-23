@@ -1,10 +1,10 @@
 import { useState, useEffect} from 'react';
-import {Users, Search } from 'lucide-react';
+import {Users} from 'lucide-react';
 import PaginationComponent from '@/components/common/Pagination';
-import { useSearchParams } from 'react-router-dom';
 import {toast} from "sonner";
 import Loading from '@/components/common/AdminLoading';
 import UserLine from '@/pages/admin/users/components/UserLine';
+import SearchUser from '@/pages/admin/components/SearchInput.jsx';
 // User Detail Modal Component
 
 
@@ -16,17 +16,12 @@ export default function UserAdminPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [users, setUsers] = useState();
   const [totalUsers, setTotalUsers] = useState(0);
-
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [currentPage, setCurrentPage] = useState(searchParams.get("page") || 1);
-  console.log("Current Page:", currentPage);
+  const [totalUsersInPage, setTotalUsersInPage] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
   const [numberOfPages, setNumberOfPages] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
+  const [submitSearchQuery, setSubmitSearchQuery] = useState('');
 
-  const handleSetCurrentPage = (page) => {
-    setCurrentPage(page);
-    setSearchParams({ page });
-  }
 
 
 
@@ -35,8 +30,7 @@ export default function UserAdminPage() {
   useEffect (() => {
     // List Users
     setIsLoading(true);
-    const page = searchParams.get("page") || 1;
-    fetch(`${import.meta.env.VITE_API_URL}/api/admin/user/listUsers?page=${page}&limit=5`,{
+    fetch(`${import.meta.env.VITE_API_URL}/api/admin/user/listUsers?page=${currentPage}&limit=5&search=${submitSearchQuery}`,{
       method: "GET",
       credentials: "include"
     })
@@ -51,12 +45,19 @@ export default function UserAdminPage() {
     .then (data => {
         setUsers (data.data);
         setNumberOfPages (data.totalPages);
+        setTotalUsersInPage (data.totalCount);
     })
     .catch (err => {
       console.error("Error fetching users:", err);
       toast.error("Failed to fetch users");
     });
 
+    
+
+    setIsLoading(false);
+  }, [currentPage, submitSearchQuery]);
+  
+  useEffect (() => {
     // Total Users
     fetch(`${import.meta.env.VITE_API_URL}/api/admin/user/total-users`)
     .then (res => {
@@ -74,9 +75,7 @@ export default function UserAdminPage() {
       console.error("Error fetching total users:", err);
       toast.error("Failed to fetch total users");
     });
-
-    setIsLoading(false);
-  }, [searchParams]);
+  }, []);
 
 
 
@@ -115,31 +114,16 @@ export default function UserAdminPage() {
           </div>
         </div>
 
-        {/* Search Bar */}
-        <div className="mb-8">
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-            <div className="flex items-center gap-4">
-              <div className="flex-1">
-                <label className="block text-slate-700 text-sm font-semibold mb-2">Search Users</label>
-                <div className="relative">
-                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
-                  <input
-                    type="text"
-                    placeholder="Search by username, email, or role..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-slate-50 text-slate-800 placeholder-slate-400 font-medium"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
+        {/* Search */}
+        <div className="mb-6">
+          <SearchUser labelName={"Seach User"} placeHolder={"Seach by username, email, role, description..."} searchQuery = {searchQuery} setSearchQuery={setSearchQuery} setSubmitSearchQuery = {setSubmitSearchQuery} setPage = {setCurrentPage}></SearchUser>
         </div>
 
         {/* User Table */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
           <div className="px-6 py-5 border-b border-slate-200 bg-slate-50">
             <h2 className="text-xl font-bold text-slate-800">Users Directory</h2>
+            <p className="text-slate-600 text-sm mt-1">Total {totalUsersInPage} users found</p>
             <p className="text-slate-600 text-sm mt-1">View and manage all registered users</p>
           </div>
           <div className="overflow-x-auto">
@@ -165,15 +149,21 @@ export default function UserAdminPage() {
             </table>
 
           {/* Pagination */}
-          <div className="px-6 py-5 bg-slate-50 border-t border-slate-200">
+          <div className="px-6 py-5 w-full">
             <div className="flex items-center justify-between">
+              {totalUsersInPage ?
               <div className="text-slate-600 text-sm font-medium">
                 Showing page <span className="font-bold text-slate-800">{currentPage}</span> of <span className="font-bold text-slate-800">{numberOfPages}</span>
               </div>
+              :
+              <div className="text-slate-600 text-sm mx-auto font-medium">
+                No users found
+              </div>
+              }
               <PaginationComponent
                 numberOfPages={numberOfPages}
                 currentPage={currentPage}
-                controlPage={handleSetCurrentPage}
+                controlPage={setCurrentPage}
               />
             </div>
           </div>

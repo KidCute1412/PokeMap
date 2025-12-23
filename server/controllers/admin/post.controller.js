@@ -4,15 +4,20 @@ export const getAllPosts = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 5;
-        const numberOfPosts = await postService.countPosts();
-        const totalPages = Math.ceil(numberOfPosts / limit);
-        const posts = await postService.getAllPosts({page: page, limit: limit});
+        const search = req.query.search || '';
+        const posts = await postService.getAllPosts({page: page, limit: limit, search: search});
+        if (!posts) {
+            return res.status(404).json({
+                success: false,
+                message: 'An error occurred while retrieving posts'
+            });
+        }
         res.json({
             success: true,
             message: 'Posts retrieved successfully',
-            data: posts,
-            numberOfPages: totalPages,
-            totalPost: numberOfPosts
+            data: posts.data,
+            totalCount: posts.totalCount,
+            totalPages: Math.ceil(posts.totalCount / limit)
         });
     } catch (error) {
         res.json({
@@ -23,6 +28,23 @@ export const getAllPosts = async (req, res) => {
     }
 }
 
+export const getTotalPosts = async (req, res) => {
+    try {
+        const totalPosts = await postService.countPosts();
+        res.json({
+            success: true,
+            message: 'Total posts retrieved successfully',
+            data: totalPosts
+        });
+    }
+    catch (error) {
+        res.json({
+            success: false,
+            message: 'An error occurred while retrieving total posts',
+            error: error.message
+        });
+    }
+}
 export const getPostById = async (req, res) => {
     const { postId } = req.params;
     try {

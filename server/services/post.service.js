@@ -8,71 +8,189 @@ import mongoose from 'mongoose';
 import * as notificationService from './notification.service.js';
 
 //  ADMIN FUNCTIONS
-export const getAllPosts = async ({page, limit}) => {
-    const skip = (page - 1) * limit;
+export const getAllPosts = async ({page, limit, search}) => {
+    
+    try{
+        const skip = (page - 1) * limit;
+        /** @type {import('mongoose').PipelineStage[]} */
+        let pipeline = [];
 
-    const PostData = await Post.aggregate([
-        {
-            $skip: skip,
-        },
-        {
-            $limit: limit,
-        },
-        {
-            $sort: { createdAt: -1 },
-        },
-        {
+        let userIds = []; // For storing matching user IDs from search
+
+        // Step 0: If searching, find matching users first
+        if (search && search.trim() !== "") {
+            const matchingUsers = await User.aggregate([
+                {
+                    $search: {
+                        index: "user_search_index",
+                        text: {
+                            query: search,
+                            path: ["username"],
+                            fuzzy: { maxEdits: 1 }
+                        }
+                    }
+                },
+                {
+                    $project: { _id: 1 }
+                }
+            ]);
+
+            userIds = matchingUsers.map(u => u._id);
+        }
+
+        // Step 1: Search on content FIRST (if search provided)
+        if (search && search.trim() !== "") {
+            pipeline.push({
+                $search: {
+                    index: "post_search_index",
+                    text: {
+                        query: search,
+                        path: ["content"],
+                        fuzzy: { maxEdits: 1 }
+                    }
+                }
+            });
+
+            pipeline.push({
+                $addFields: {
+                    searchScore: { $meta: "searchScore" }
+                }
+            });
+
+            // Union with posts from matching users
+            if (userIds.length > 0) {
+                pipeline.push({
+                    $unionWith: {
+                        coll: "posts",
+                        pipeline: [
+                            {
+                                $match: {
+                                    user: { $in: userIds }
+                                }
+                            },
+                            {
+                                $addFields: {
+                                    searchScore: 10  // Lower score for username match
+                                }
+                            }
+                        ]
+                    }
+                });
+            }
+
+            // Remove duplicates if same post matches both content and user
+            pipeline.push({
+                $group: {
+                    _id: "$_id",
+                    doc: { $first: "$$ROOT" },
+                    maxScore: { $max: "$searchScore" }
+                }
+            });
+
+            pipeline.push({
+                $replaceRoot: {
+                    newRoot: {
+                        $mergeObjects: ["$doc", { searchScore: "$maxScore" }]
+                    }
+                }
+            });
+        }
+
+        // Step 2: Lookup userInfo
+        pipeline.push({
             $lookup: {
-                from : "users",
+                from: "users",
                 localField: "user",
                 foreignField: "_id",
                 as: "userInfo"
             }
-        },
-        {
-            $lookup: {
-                from: "post_warnings",
-                localField: "_id",
-                foreignField: "post",
-                as: "warnings"
-            }
-        },
-        {
-            $lookup:{
-                from: "comments",
-                localField: "_id",
-                foreignField: "post",
-                as: "comments"
+        });
 
-            }
-        },
-        {
-            $lookup: {
-                from: "likes",
-                localField: "_id",
-                foreignField: "post",
-                as: "likes"
-            }
-        },
-        {
+        // Step 3: Extract username and avatar
+        pipeline.push({
             $addFields: {
-                username : { $arrayElemAt: [ "$userInfo.username", 0 ] },
-                avatar : { $arrayElemAt: [ "$userInfo.profile.avatar", 0 ] },
-                warning_counts : {$arrayElemAt : ["$warnings.warningCount", 0]},
-                comments: { $size: "$comments" },
-                likes: { $size: "$likes" }
-
+                username: { $arrayElemAt: ["$userInfo.username", 0] },
+                avatar: { $arrayElemAt: ["$userInfo.profile.avatar", 0] }
             }
-        },
-        {
+        });
+
+        // Step 4: Sort
+        pipeline.push({
+            $sort: search && search.trim() !== ""
+                ? { searchScore: -1, createdAt: -1 }
+                : { createdAt: -1 }
+        });
+
+        // Step 5: Remove userInfo before facet
+        pipeline.push({
             $project: {
                 userInfo: 0,
-                warnings: 0,
+                searchScore: 0
             }
-        }
-    ])
-    console.log(PostData);
-    return PostData;
+        });
+
+        // Step 6: Facet for pagination + other lookups
+        pipeline.push({
+            $facet: {
+                data: [
+                    { $skip: skip },
+                    { $limit: limit },
+                    {
+                        $lookup: {
+                            from: "post_warnings",
+                            localField: "_id",
+                            foreignField: "post",
+                            as: "warnings"
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from: "comments",
+                            localField: "_id",
+                            foreignField: "post",
+                            as: "comments"
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from: "likes",
+                            localField: "_id",
+                            foreignField: "post",
+                            as: "likes"
+                        }
+                    },
+                    {
+                        $addFields: {
+                            warning_counts: { $arrayElemAt: ["$warnings.warningCount", 0] },
+                            comments: { $size: "$comments" },
+                            likes: { $size: "$likes" }
+                        }
+                    },
+                    {
+                        $project: {
+                            warnings: 0
+                        }
+                    }
+                ],
+                total: [
+                    { $count: "count" }
+                ]
+            }
+        });
+
+        const result = await Post.aggregate(pipeline);
+        const posts = result[0].data;
+        const totalCount = result[0].total[0] ? result[0].total[0].count : 0;
+
+        return {
+            data: posts,
+            totalCount: totalCount
+        };
+    }
+    catch (error) {
+        console.error("Error in getAllPosts:", error);
+        return null;
+    }
 }
 
 export const getPostById = async (postId) => {

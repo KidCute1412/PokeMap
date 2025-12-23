@@ -4,13 +4,14 @@ export const getUserLists = async (req, res) => {
     try {
         const page = req.query.page || 1;
         const limit = req.query.limit || 10;
-        const total_pages = Math.ceil(await userService.countUsers() / limit);
-        const users = await userService.getAllUsers({page: Number(page), limit: Number(limit)});
+        const search = req.query.search || "";
+        const users = await userService.getAllUsers({page: Number(page), limit: Number(limit), search: search});
         res.json({
             success: true,
             message: 'Users retrieved successfully',
-            data: users,
-            totalPages: total_pages,
+            data: users.users,
+            totalCount: users.totalCount,
+            totalPages: Math.ceil(users.totalCount / limit),
         });
     } catch (error) {
         res.json({
@@ -51,24 +52,6 @@ export const getUserById = async (req, res) => {
     }
 }
 
-// export const getTotalUserPages = async (req, res) => {
-//     try {
-//         const totalUsers = await userService.countUsers();
-//         const limit = req.query.limit;
-//         const usersPerPage =  limit || 5; // 1 page shows 5 users 
-//         const totalPages = Math.ceil(totalUsers / usersPerPage);
-//         res.json({
-//             success: true,
-//             message: 'Total user pages retrieved successfully',
-//             data: { totalPages },
-//         });
-//     } catch (error) {
-//         res.json({
-//             success: false,
-//             message: error.message,
-//         });
-//     }
-// }
 
 export const getTotalUsers = async (req, res) => {
     try {

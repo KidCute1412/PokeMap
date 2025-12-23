@@ -1,29 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import {useSearchParams} from "react-router-dom";
-import {MessageCircle, Search  } from 'lucide-react';
+import {MessageCircle} from 'lucide-react';
 import PostLine from '@/pages/admin/posts/components/PostLine.jsx';
 import PaginationComponent from '@/components/common/Pagination';
 import Loading from '@/components/common/AdminLoading';
 import {toast} from "sonner";
+import SearchInput from '@/pages/admin/components/SearchInput.jsx';
 const PostManagementDashboard = () => {
   const [posts, setPosts] = useState([]);
-   const [searchParams, setSearchParams] = useSearchParams();
-  const [currentPage, setCurrentPage] = useState(searchParams.get("page") ? parseInt(searchParams.get("page")) : 1);
+  const [currentPage, setCurrentPage] = useState(1);
   const [numberOfPages, setNumberOfPages] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
+  const [totalFoundPosts, setTotalFoundPosts] = useState(0);
   const [total_posts, setTotalPosts] = useState(0);
-  
-
   const [searchQuery, setSearchQuery] = useState('');
+  const [submitSearchQuery, setSubmitSearchQuery] = useState('');
+
 
 
   // Fetch posts data -> get posts in current page and number of page
   useEffect (() => {
-    setIsLoading(true);
-    const page = searchParams.get("page") || 1;
+    
+    const page = currentPage;
     const fetchPosts = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/post/listPosts?page=${page}&limit=5`,{
+        setIsLoading(true);
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/post/listPosts?page=${page}&limit=5&search=${submitSearchQuery}`,{
           method: "GET",
           credentials: "include"
         });
@@ -32,8 +33,9 @@ const PostManagementDashboard = () => {
           throw new Error (data.message || "Failed to fetch posts");
         }
         setPosts(data.data);
-        setNumberOfPages(data.numberOfPages);
-        setTotalPosts(data.totalPost);
+        setNumberOfPages(data.totalPages);
+        setTotalFoundPosts(data.totalCount);
+
       }
       catch (error) {
         console.error("Error fetching posts:", error);
@@ -43,16 +45,24 @@ const PostManagementDashboard = () => {
     fetchPosts().finally(() => setIsLoading (false));
     
     
-  }, [searchParams]);
+  }, [currentPage, submitSearchQuery]);
 
-  
+  useEffect (() => {
+    // Fetch total posts
+    fetch(`${import.meta.env.VITE_API_URL}/api/admin/post/total-posts`, {
+      method : "GET",
+      credentials : "include",
+    })
+    .then (res => res.json())
+    .then (data => {
+      setTotalPosts(data.data);
+      console.log ("Total posts:", data.data);
+    })
+    .catch (err => {
+      console.error("Error fetching total posts:", err);
+    });
+  }, [])
 
-
-
-  const handleSetCurrentPage = (page) => {
-    setCurrentPage(page);
-    setSearchParams({ page });
-  }
 
 
 
@@ -93,30 +103,15 @@ const PostManagementDashboard = () => {
         </div>
 
         {/* Search Bar */}
-        <div className="mb-8">
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-            <div className="flex items-center gap-4">
-              <div className="flex-1">
-                <label className="block text-slate-700 text-sm font-semibold mb-2">Search Posts</label>
-                <div className="relative">
-                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
-                  <input
-                    type="text"
-                    placeholder="Search posts by author, content, or keywords..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-slate-50 text-slate-800 placeholder-slate-400 font-medium"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
+        <div className="mb-6">
+          <SearchInput labelName={"Seach Posts"} placeHolder={"Seach by content of posts"} searchQuery = {searchQuery} setSearchQuery={setSearchQuery} setSubmitSearchQuery = {setSubmitSearchQuery} setPage = {setCurrentPage}></SearchInput>
         </div>
 
         {/* Posts Table */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
           <div className="px-6 py-5 border-b border-slate-200 bg-slate-50">
             <h2 className="text-xl font-bold text-slate-800">Posts Directory</h2>
+            <p className="text-slate-600 text-sm mt-1">Found {totalFoundPosts} posts</p>
             <p className="text-slate-600 text-sm mt-1">View and manage all posts</p>
           </div>
           <div className="overflow-x-auto">
@@ -144,13 +139,19 @@ const PostManagementDashboard = () => {
           {/* Pagination */}
           <div className="px-6 py-5 bg-slate-50 border-t border-slate-200">
             <div className="flex items-center justify-between">
+              {totalFoundPosts ?
               <div className="text-slate-600 text-sm font-medium">
                 Showing page <span className="font-bold text-slate-800">{currentPage}</span> of <span className="font-bold text-slate-800">{numberOfPages}</span>
               </div>
+              :
+              <div className="text-slate-600 text-sm mx-auto font-medium">
+                No posts found
+              </div>
+              }
               <PaginationComponent
                 numberOfPages={numberOfPages}
                 currentPage={currentPage}
-                controlPage={handleSetCurrentPage}
+                controlPage={setCurrentPage}
               />
             </div>
           </div>
@@ -163,10 +164,5 @@ const PostManagementDashboard = () => {
   );
 
 };
-
-
-
-
-
 
 export default PostManagementDashboard;

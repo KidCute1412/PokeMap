@@ -6,6 +6,8 @@ const router = express.Router();
 
 router.get('/listPosts', postController.getAllPosts);
 
+router.get('/total-posts', postController.getTotalPosts);
+
 router.patch('/warn/:postId', postController.warnPost);
 
 router.patch('/delete/:postId', postController.deletePost);

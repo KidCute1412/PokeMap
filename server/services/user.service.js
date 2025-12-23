@@ -1,63 +1,112 @@
+import { parse } from 'dotenv';
 import { User } from '../models/user.model.js';
 import moongoose from 'mongoose';
 import speakingURL from "speakingurl"
 
 // ADMIN FUNCTION
-export const getAllUsers = async ({page, limit}) => {
+export const getAllUsers = async ({page, limit, search}) => {
   try {
-    const skip = (page - 1) * limit;
-
-
-    const userInfos = await User.aggregate ([
-      {
-        $skip: skip,
-      },
-      {
-        $limit: limit,
-      },
-      {
-        $sort: { createdAt: -1 },
-      },
-      {
-        $lookup: {
-          from : "follows",
-          localField: "_id",
-          foreignField: "following",
-          as: "followersList"
-
-        } 
-      },
-      {
-        $lookup: {
-          from : "follows",
-          localField: "_id",
-          foreignField: "follower",
-          as: "followingList"
-      }
-      },
-      {
-        $addFields: {
-          'profile.followers': { $size: "$followersList" },
-          'profile.following': { $size: "$followingList" },
-        }
-      },
-      {
-        $project: {
-          followersList: 0,
-          followingList: 0
-        }
-      
-      }
-
-    ])
-    console.log(userInfos);
-    return userInfos;
+    const limitPage = parseInt(limit) > 0 ? parseInt(limit) : 10;
+    const pageNumber = parseInt(page) > 0 ? parseInt(page) : 1;
+    const skip = (pageNumber - 1) * limitPage;
     
+    /** @type {import('mongoose').PipelineStage[]} */
+    let pipeline = [];
+    
+    // Search
+    if (search && search.trim() !== "") {
+      pipeline.push(
+        {
+          $search: {
+            index: "user_search_index",
+            text: {
+              query: search,
+              path: ["username", "description", "email", "role"],
+              fuzzy: { maxEdits: 1}
+            }
+          }
+        }
+      );
+      // Add score to sort 
+      pipeline.push(
+        {
+          $addFields: {
+            searchScore: { $meta: "searchScore" }
+          }
+        }
+      );
+    }
+    
+    // Sort both in search and non-search cases
+    pipeline.push(
+      {
+        $sort: search && search.trim() !== "" 
+          ? { searchScore: -1 }  // By relevance when searching
+          : { createdAt: -1 }     // By creation date otherwise
+      }
+    );
+
+    // Facet for pagination and total count
+    pipeline.push(
+      {
+        $facet: {
+          // Branch 1: Get paginated data with full details
+          data: [
+            { $skip: skip },
+            { $limit: limitPage },
+            {
+              $lookup: {
+                from: "follows",
+                localField: "_id",
+                foreignField: "following",
+                as: "followersList"
+              }
+            },
+            {
+              $lookup: {
+                from: "follows",
+                localField: "_id",
+                foreignField: "follower",
+                as: "followingList"
+              }
+            },
+            {
+              $addFields: {
+                'profile.followers': { $size: "$followersList" },
+                'profile.following': { $size: "$followingList" }
+              }
+            },
+            {
+              $project: {
+                followersList: 0,
+                followingList: 0,
+                searchScore: 0
+              }
+            }
+          ],
+          // Branch 2: Get total count (before skip/limit)
+          total: [
+            { $count: "count" }
+          ]
+        }
+      }
+    );
+    
+    // Execute aggregation
+    const result = await User.aggregate(pipeline);
+    const users = result[0].data;
+    const totalCount = result[0].total[0] ? result[0].total[0].count : 0;
+    
+    return {
+      users: users,
+      totalCount: totalCount,
+    };
 
   } catch (error) {
-    throw new Error(`Error fetching users: ${error.message}`);
+    return null;
   }
 }
+
 
 export const getUserById = async (userId) => {
   return await User.findById(userId);
