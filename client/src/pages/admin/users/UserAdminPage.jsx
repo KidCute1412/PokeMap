@@ -116,7 +116,7 @@ export default function UserAdminPage() {
 
         {/* Search */}
         <div className="mb-6">
-          <SearchUser labelName={"Seach User"} placeHolder={"Seach by username, email, role, description..."} searchQuery = {searchQuery} setSearchQuery={setSearchQuery} setSubmitSearchQuery = {setSubmitSearchQuery} setPage = {setCurrentPage}></SearchUser>
+          <SearchUser labelName={"Search User"} placeHolder={"Search by username, email, role, description..."} searchQuery = {searchQuery} setSearchQuery={setSearchQuery} setSubmitSearchQuery = {setSubmitSearchQuery} setPage = {setCurrentPage}></SearchUser>
         </div>
 
         {/* User Table */}
