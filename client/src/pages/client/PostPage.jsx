@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import ContentPostCard from "@/pages/client/Posts/components/ContentPostCard.jsx";
-import Comment from "@/pages/client/Posts/components/Comment.jsx";
+
+import PostCard from "./Posts/components/PostCard";
 import { ArrowLeft } from "lucide-react";
-import speakingurl from "speakingurl";
+
 import { useAuth } from "@/routes/ProtectedRouter.jsx";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
@@ -90,7 +90,7 @@ export default function PostPage() {
 
     return (
         <div className="min-h-screen pt-20 px-4">
-            <div className="max-w-6xl mx-auto">
+            <div className="max-w-5xl mx-auto">
                 {/* Back button */}
                 <button
                     onClick={handleBack}
@@ -102,28 +102,13 @@ export default function PostPage() {
 
                 {/* Post content */}
                 {post && (
-                    <div className="bg-gray-800/50 rounded-2xl border border-gray-700 overflow-hidden">
-                        <div className="flex flex-col lg:flex-row">
-                            {/* Left side - Post content */}
-                            <div className="flex-1 p-6">
-                                <ContentPostCard 
-                                    data={post} 
-                                    setData={setPost}
-                                    isOwnerProfile={isOwnerProfile}
-                                    onEditClick={() => {
-                                        // Navigate to edit or show edit modal
-                                        // You can implement edit functionality here
-                                    }}
-                                />
-                            </div>
-                            
-                            {/* Right side - Comments */}
-                            <div className="lg:w-[400px] border-t lg:border-t-0 lg:border-l border-gray-700">
-                                <Comment data={post} />
-                            </div>
-                        </div>
-                    </div>
+                    <PostCard
+                        key={post._id}
+                        data={post}
+                        isOwnerProfile={isOwnerProfile}
+                    />
                 )}
+                
             </div>
         </div>
     );

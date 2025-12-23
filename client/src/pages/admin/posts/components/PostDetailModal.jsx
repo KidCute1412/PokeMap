@@ -1,4 +1,4 @@
-import { X, Heart, MessageCircle, Image, Calendar, User, FileText, Eye } from 'lucide-react';
+import { X, Heart, MessageCircle, Image, Calendar, FileText, Eye } from 'lucide-react';
 
 const PostDetailModal = ({ post, setOpenModal }) => {
   if (!post) return null;
