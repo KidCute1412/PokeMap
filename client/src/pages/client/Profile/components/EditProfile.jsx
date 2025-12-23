@@ -222,7 +222,7 @@ export default function EditProfile() {
                     <div className="flex space-x-4">
                         <button
                             type="button"
-                            onClick={() => navigate(`/profile/${speakingURL(user.username)}_${user.id}`)}
+                            onClick={() => navigate(-1)}
                             className="flex-1 px-6 py-4 cursor-pointer bg-gray-700 hover:bg-gray-600 text-white rounded-xl transition-colors font-medium text-lg"
                         >
                             Hủy
