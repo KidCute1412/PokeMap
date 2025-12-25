@@ -22,7 +22,7 @@ export const createNotification = async ({
         type,
         post: postId,
         comment: commentId,
-        contentPreview
+        contentPreview 
     });
 
     const savedNotification = await notification.save();
