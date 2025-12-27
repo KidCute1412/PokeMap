@@ -7,6 +7,7 @@ import PostEditModal from "./PostEditModal.jsx";
 import PostDeleteModal from "./PostDeleteModal.jsx";
 import PostRecoverModal from "./PostRecoverModal.jsx";
 import useIntersectionObserver from "@/hooks/useIntersectionObserver.jsx";
+import { useSocket } from "@/hooks/useSocket.jsx";
 
 
 
@@ -25,6 +26,31 @@ const PostCard = memo (function PostCard({data, isOwnerProfile = false}) {
     const [showRecoverModal, setShowRecoverModal] = useState(false);
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const imageObserver = useIntersectionObserver({ threshold: 0.1 });
+    const { socket, isConnected } = useSocket();
+
+    // Listen for comment count updates
+    useEffect(() => {
+        if (!socket || !isConnected || !post?._id) return;
+
+        // Join post room to receive updates
+        socket.emit('join_post', post._id);
+
+        const handleCommentCountUpdate = (data) => {
+            if (data.postId === post._id) {
+                setPost(prev => ({
+                    ...prev,
+                    comments: data.commentCount
+                }));
+            }
+        };
+
+        socket.on('comment_count_updated', handleCommentCountUpdate);
+
+        return () => {
+            socket.off('comment_count_updated', handleCommentCountUpdate);
+            socket.emit('leave_post', post._id);
+        };
+    }, [socket, isConnected, post?._id]);
     const handleImageClick = (index) => {
         setSelectedImageIndex(index);
         setShowImageDetail(true);

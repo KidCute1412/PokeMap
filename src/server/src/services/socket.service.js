@@ -70,6 +70,23 @@ export function initSocket(io) {
                     data: populatedComment,
                     isReply: !!parentCommentId
                 });
+
+                // Emit comment count update (only for top-level comments, not replies)
+                if (!parentCommentId) {
+                    // Count all top-level comments (not replies) for this post
+                    const Comment = (await import('../models/comment.model.js')).Comment;
+                    const commentCount = await Comment.countDocuments({
+                        post: postId,
+                        parentComment: null,
+                        isDeleted: { $ne: true }
+                    });
+
+                    // Broadcast comment count update to all clients in post room
+                    io.to(`post_${postId}`).emit("comment_count_updated", {
+                        postId,
+                        commentCount
+                    });
+                }
             } catch (error) {
                 socket.emit("comment_error", {
                     success: false,
@@ -111,6 +128,11 @@ export function initSocket(io) {
             try {
                 const { commentId, userId, postId } = data;
 
+                // Get comment before deleting to check if it's a top-level comment
+                const Comment = (await import('../models/comment.model.js')).Comment;
+                const comment = await Comment.findById(commentId);
+                const isTopLevelComment = comment && !comment.parentComment;
+
                 await commentService.deleteComment({
                     commentId,
                     userId
@@ -120,6 +142,20 @@ export function initSocket(io) {
                     success: true,
                     commentId: commentId
                 });
+
+                // Update comment count if it was a top-level comment
+                if (isTopLevelComment) {
+                    const commentCount = await Comment.countDocuments({
+                        post: postId,
+                        parentComment: null,
+                        isDeleted: { $ne: true }
+                    });
+
+                    io.to(`post_${postId}`).emit("comment_count_updated", {
+                        postId,
+                        commentCount
+                    });
+                }
             } catch (error) {
                 socket.emit("comment_error", {
                     success: false,

@@ -366,8 +366,10 @@ export default function CommentSection({ postId, currentUserId }) {
 
                             <div className="comment-actions">
                                 <button
-                                    className={`action-btn like-btn ${hasUserLiked(comment.likedBy) ? 'liked' : ''}`}
-                                    onClick={() => handleLikeComment(comment._id)}
+                                    className={`action-btn like-btn ${hasUserLiked(comment.likedBy) ? 'liked' : ''} ${!currentUserId ? 'disabled' : ''}`}
+                                    onClick={() => currentUserId && handleLikeComment(comment._id)}
+                                    disabled={!currentUserId}
+                                    title={!currentUserId ? 'Please sign in to like comments' : ''}
                                 >
                                     {hasUserLiked(comment.likedBy) ? '❤️' : '🤍'} {comment.likedBy?.length || 0}
                                 </button>
@@ -417,8 +419,10 @@ export default function CommentSection({ postId, currentUserId }) {
                                             )}
                                             <div className="comment-actions">
                                                 <button
-                                                    className={`action-btn like-btn ${hasUserLiked(reply.likedBy) ? 'liked' : ''}`}
-                                                    onClick={() => handleLikeComment(reply._id)}
+                                                    className={`action-btn like-btn ${hasUserLiked(reply.likedBy) ? 'liked' : ''} ${!currentUserId ? 'disabled' : ''}`}
+                                                    onClick={() => currentUserId && handleLikeComment(reply._id)}
+                                                    disabled={!currentUserId}
+                                                    title={!currentUserId ? 'Please sign in to like comments' : ''}
                                                 >
                                                     {hasUserLiked(reply.likedBy) ? '❤️' : '🤍'} {reply.likedBy?.length || 0}
                                                 </button>

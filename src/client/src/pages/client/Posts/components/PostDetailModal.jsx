@@ -27,7 +27,7 @@ export default function PostDetailModal({ data, setData, onClose, onImageClick }
                         <ContentPostCard data={data} setData = {setData} handleImageClick={onImageClick}/>
                     </div>
                     {/* Right side - Comments */}
-                    <Comment data={data} />
+                    <Comment data={data} setData={setData} />
 
                 </div>
             </div>

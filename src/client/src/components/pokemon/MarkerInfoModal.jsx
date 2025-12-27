@@ -9,6 +9,7 @@ export default function MarkerInfoModal({ marker, onClose, onSave, onDelete, pok
     const [pokemonDetails, setPokemonDetails] = useState(null);
     const [searchError, setSearchError] = useState('');
     const [pokemonNamesList, setPokemonNamesList] = useState([]);
+    const [isPinned, setIsPinned] = useState(true);
     const debounceTimer = useRef(null);
 
     // Load Pokemon names list for search
@@ -126,6 +127,11 @@ export default function MarkerInfoModal({ marker, onClose, onSave, onDelete, pok
         if (marker?.notes) {
             setNotes(marker.notes);
         }
+        if (marker?.isPinned !== undefined) {
+            setIsPinned(marker.isPinned);
+        } else {
+            setIsPinned(true); // Default to pinned
+        }
     }, [marker]);
 
     const handleSave = () => {
@@ -133,11 +139,16 @@ export default function MarkerInfoModal({ marker, onClose, onSave, onDelete, pok
             ...marker,
             pokemonId: selectedPokemon,
             pokemonName: pokemonDetails?.name || '',
-            notes: notes
+            notes: notes,
+            isPinned: isPinned
         };
         onSave(savedMarker);
         // Close modal after save
         onClose();
+    };
+
+    const handleTogglePin = () => {
+        setIsPinned(!isPinned);
     };
 
     const getTypeColor = (type) => {
@@ -291,6 +302,23 @@ export default function MarkerInfoModal({ marker, onClose, onSave, onDelete, pok
                             className="w-full bg-gray-800 text-white rounded-lg px-3 py-2 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                         />
                     </div>
+
+                    {/* Pin/Unpin Button */}
+                    <div>
+                        <button
+                            type="button"
+                            onClick={handleTogglePin}
+                            className={`w-full px-4 py-2 rounded-lg font-medium transition-colors ${isPinned
+                                ? 'bg-green-600 text-white hover:bg-green-700'
+                                : 'bg-gray-600 text-white hover:bg-gray-700'
+                                }`}
+                        >
+                            {isPinned ? 'Pinned' : 'Unpin'}
+                        </button>
+                        <p className="text-xs text-gray-400 mt-1">
+                            {isPinned ? 'Marker is pinned (fully visible)' : 'Marker is unpinned (semi-transparent)'}
+                        </p>
+                    </div>
                 </div>
 
                 {/* Footer */}
@@ -298,16 +326,14 @@ export default function MarkerInfoModal({ marker, onClose, onSave, onDelete, pok
                     {onDelete && marker?.id && (
                         <button
                             onClick={() => {
-                                if (window.confirm('Are you sure you want to delete this marker?')) {
-                                    onDelete(marker.id);
-                                    onClose();
-                                }
+                                onDelete(marker.id);
+                                onClose();
                             }}
                             className="px-4 py-2 bg-red-600 cursor-pointer text-white rounded-lg hover:bg-red-700 transition-colors"
                         >
                             Delete
                         </button>
-                    )}  
+                    )}
                     <div className="flex gap-2 ml-auto">
                         <button
                             onClick={onClose}

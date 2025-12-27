@@ -51,7 +51,8 @@ export default function MapPage() {
                         if (result.data.markers && result.data.markers.length > 0) {
                             const restoredMarkers = result.data.markers.map((marker, index) => ({
                                 ...marker,
-                                id: marker.id || index + 1
+                                id: marker.id || index + 1,
+                                isPinned: marker.isPinned !== undefined ? marker.isPinned : true
                             }));
                             setMarkers(restoredMarkers);
                             // Set counter to max ID + 1
@@ -143,7 +144,8 @@ export default function MapPage() {
                         pokemonName: pokemon.name,
                         notes: `${spawn.location} (${spawn.percentage}%${spawn.isDay ? ', Day' : ', Night'})`,
                         location: spawn.location,
-                        percentage: spawn.percentage
+                        percentage: spawn.percentage,
+                        isPinned: true
                     }));
 
                     console.log('Created markers:', newMarkers);
@@ -189,7 +191,8 @@ export default function MapPage() {
                     pokemonName: pokemon.name,
                     notes: `${spawn.location} (${spawn.percentage}%${spawn.isDay ? ', Day' : ', Night'})`,
                     location: spawn.location,
-                    percentage: spawn.percentage
+                    percentage: spawn.percentage,
+                    isPinned: true
                 }));
 
                 console.log('Created markers:', newMarkers);
@@ -224,7 +227,8 @@ export default function MapPage() {
                 lng: latlng.lng,
                 pokemonId: selectedPokemon.id,
                 pokemonName: selectedPokemon.name,
-                notes: ''
+                notes: '',
+                isPinned: true
             };
             setMarkers(prev => [...prev, newMarker]);
             setMarkerIdCounter(prev => prev + 1);
@@ -261,7 +265,8 @@ export default function MapPage() {
                 lng: pendingMarkerPosition.lng,
                 pokemonId: markerData.pokemonId,
                 pokemonName: markerData.pokemonName || '',
-                notes: markerData.notes || ''
+                notes: markerData.notes || '',
+                isPinned: markerData.isPinned !== undefined ? markerData.isPinned : true
             };
             setMarkers(prev => [...prev, newMarker]);
             setMarkerIdCounter(prev => prev + 1);

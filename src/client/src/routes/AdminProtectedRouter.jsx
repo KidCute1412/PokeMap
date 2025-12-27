@@ -17,7 +17,7 @@ export default function AdminProtectedRouter({ children }) {
         }
 
         // Verify token with server
-        fetch("http://localhost:10000/api/admin/auth/verify-token", {
+        fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:10000'}/api/admin/auth/verify-token`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",

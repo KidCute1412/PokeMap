@@ -314,7 +314,7 @@
     color: #fff;
 }
 
-.like-btn:hover {
+.like-btn:hover:not(.disabled):not(:disabled) {
     background: rgba(251, 191, 36, 0.2);
     color: #fbbf24;
 }
@@ -324,8 +324,15 @@
     color: #f87171;
 }
 
-.like-btn.liked:hover {
+.like-btn.liked:hover:not(.disabled):not(:disabled) {
     background: rgba(239, 68, 68, 0.3);
+}
+
+.like-btn.disabled,
+.like-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
 }
 
 .reply-btn:hover {

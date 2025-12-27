@@ -100,7 +100,7 @@ export default function Dashboard() {
             </p>
 
             {/* Quick Stats */}
-            <div className="grid grid-cols-3 gap-6 max-w-3xl mx-auto">
+            <div className="grid grid-cols-2 gap-6 max-w-2xl mx-auto">
                 {/* Users */}
               <a href = "/admin/users" className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl">
                 <div className="text-3xl mb-2">👥</div>
@@ -113,12 +113,6 @@ export default function Dashboard() {
                 <div className="text-2xl font-bold text-gray-800">Posts</div>
                 <div className="text-sm text-gray-600 mt-1">Content overview</div>
               </a>
-              {/* Settings */}
-              <div className="bg-gradient-to-br from-pink-50 to-pink-100 p-6 rounded-xl">
-                <div className="text-3xl mb-2">⚙️</div>
-                <div className="text-2xl font-bold text-gray-800">Settings</div>
-                <div className="text-sm text-gray-600 mt-1">Configuration</div>
-              </div>
             </div>
           </div>
         </div>
