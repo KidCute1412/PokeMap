@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useImperativeHandle, forwardRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { MapContainer, ImageOverlay, useMap, Marker, Popup, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import pokemonMapImage from '@/assets/maps/PokeMap.png';
@@ -70,19 +70,6 @@ function MapClickHandler({ onMapClick }) {
     return null;
 }
 
-// Component to control map zoom and center from parent
-function MapController({ onMapReady }) {
-    const map = useMap();
-
-    useEffect(() => {
-        if (onMapReady && map) {
-            onMapReady(map);
-        }
-    }, [map, onMapReady]);
-
-    return null;
-}
-
 // Custom Pokemon marker icon
 function createPokemonIcon(pokemonSprite) {
     if (!pokemonSprite) return DefaultIcon;
@@ -103,34 +90,15 @@ function createPokemonIcon(pokemonSprite) {
     });
 }
 
-const PokemonMap = forwardRef(function PokemonMap({
+export default function PokemonMap({
     className = "",
     markers = [],
     onMapClick,
     onMarkerClick
-}, ref) {
+}) {
     const MAP_SIZE = 1000;
     const imageBounds = [[0, 0], [-MAP_SIZE, MAP_SIZE]];
     const [pokemonSprites, setPokemonSprites] = useState({});
-    const mapRef = useRef(null);
-
-    // Expose map control methods via ref
-    useImperativeHandle(ref, () => ({
-        zoomToIsland: (center) => {
-            if (mapRef.current) {
-                // 4x from minimum zoom (minZoom is 0, so 4x = zoom level 2)
-                const newZoom = 2;
-                mapRef.current.setView(center, newZoom, {
-                    animate: true,
-                    duration: 0.5
-                });
-            }
-        }
-    }));
-
-    const handleMapReady = (map) => {
-        mapRef.current = map;
-    };
 
     // Fetch Pokemon sprites for markers
     useEffect(() => {
@@ -184,6 +152,7 @@ const PokemonMap = forwardRef(function PokemonMap({
                 doubleClickZoom={true}
                 dragging={true}
                 attributionControl={false}
+                onClick={(e) => onMapClick && onMapClick(e.latlng)}
             >
                 <ImageOverlay
                     url={pokemonMapImage}
@@ -193,7 +162,6 @@ const PokemonMap = forwardRef(function PokemonMap({
                 <MapBounds bounds={imageBounds} />
                 <FitMarkers markers={markers} imageBounds={imageBounds} />
                 <MapClickHandler onMapClick={onMapClick} />
-                <MapController onMapReady={handleMapReady} />
 
                 {/* Render markers */}
                 {markers.map((marker, index) => {
@@ -243,7 +211,5 @@ const PokemonMap = forwardRef(function PokemonMap({
             </MapContainer>
         </div>
     );
-});
-
-export default PokemonMap;
+}
 

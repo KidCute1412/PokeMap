@@ -7,22 +7,22 @@ import encounterTableRaw from "@/assets/maps/Pokemon Ultra Sun - Encounter Table
 
 const LOCATION_COORDINATES = {
     // --- MELEMELE ISLAND (Top Left) ---
-    "Route 1": { lat: -340, lng: 376 },
-    "Route 1 (Hau'oli Outskirts)": { lat: -338, lng: 419 },
-    "Route 1 (Trainers' School)": { lat: -304, lng: 269 },
-    "Hau'oli City": { lat: -366, lng: 280 },
-    "Hau'oli City (Beachfront)": { lat: -385, lng: 346 },
-    "Hau'oli City (Shopping District)": { lat: -377, lng: 326 },
-    "Hau'oli City (Marina)": { lat: -400, lng: 329 },
-    "Iki Town": { lat: -318, lng: 346 },
-    "Route 2": { lat: -333, lng: 285 },
-    "Hau'oli Cemetery": { lat: -328, lng: 312 },
-    "Berry Fields": { lat: -307, lng: 295 },
-    "Verdant Cavern": { lat: -297, lng: 314 },
-    "Route 3": { lat: -274, lng: 350 },
+    "Route 1": { lat: -302, lng: 271 },
+    "Route 1 (Hau’oli Outskirts)": { lat: -338, lng: 419 },
+    "Route 1 (Trainers’ School)": { lat: -304, lng: 269 },
+    "Hau’oli City": { lat: -304, lng: 269 },
+    "Hau’oli City (Beachfront)": { lat: -304, lng: 269 },
+    "Hau’oli City (Shopping District)": { lat: -304, lng: 269 },
+    "Hau’oli City (Marina)": { lat: -304, lng: 269 },
+    "Iki Town": { lat: -281, lng: 305 },
+    "Route 2": { lat: -302, lng: 271 },
+    "Hau’oli Cemetery": { lat: -302, lng: 271 },
+    "Berry Fields": { lat: -304, lng: 269 },
+    "Verdant Cavern": { lat: -284, lng: 302 },
+    "Route 3": { lat: -265, lng: 347 },
     "Melemele Meadow": { lat: -292, lng: 375 },
-    "Seaward Cave": { lat: -291, lng: 356 },
-    "Kala'e Bay": { lat: -305, lng: 387 },
+    "Seaward Cave": { lat: -269, lng: 340 },
+    "Kala’e Bay": { lat: -266, lng: 345 },
     "Ten Carat Hill": { lat: -425, lng: 164 },
     "Ten Carat Hill (Farthest Hollow)": { lat: -425, lng: 164 },
     "Melemele Sea": { lat: -308, lng: 268 },
@@ -40,7 +40,7 @@ const LOCATION_COORDINATES = {
     "Wela Volcano Park": { lat: -279, lng: 635 },
     "Route 8": { lat: -327, lng: 577 },
     "Lush Jungle": { lat: -308, lng: 596 },
-    "Diglett's Tunnel": { lat: -352, lng: 558 },
+    "Diglett’s Tunnel": { lat: -352, lng: 558 },
     "Route 9": { lat: -365, lng: 547 },
     "Konikoni City": { lat: -395, lng: 541 },
     "Memorial Hill": { lat: -490, lng: 566 },
@@ -65,19 +65,19 @@ const LOCATION_COORDINATES = {
     "Route 15": { lat: -644, lng: 885 },
     "Aether House": { lat: -635, lng: 894 },
     "Route 16": { lat: -624, lng: 893 },
-    "Ula'ula Meadow": { lat: -600, lng: 892 },
+    "Ula’ula Meadow": { lat: -600, lng: 892 },
     "Lake of the Sun/Moone": { lat: -600, lng: 892 },
     "Route 17": { lat: -569, lng: 863 },
     "Po Town": { lat: -569, lng: 863 },
     "Mount Lanakila": { lat: -538, lng: 808 },
 
     // --- PONI ISLAND (Bottom Left) ---
-    "Seafolk Village": { lat: -545, lng: 135 },
+    "Seafolk Village": { lat: -647, lng: 353 },
     "Poni Wilds": { lat: -649, lng: 359 },
     "Ancient Poni Path": { lat: -651, lng: 364 },
     "Poni Breaker Coast": { lat: -656, lng: 389 },
     "Ruins of Hope": { lat: -656, lng: 404 },
-    "Exeggutor Island": { lat: -528, lng: 85 },
+    "Exeggutor Island": { lat: -865, lng: 231 },
     "Vast Poni Canyon": { lat: -643, lng: 343 },
     "Altar of the Sunne/Moone": { lat: -635, lng: 342 },
     "Poni Grove": { lat: -642, lng: 342 },
@@ -88,7 +88,7 @@ const LOCATION_COORDINATES = {
     "Battle Tree": { lat: -617, lng: 345 },
 
     // --- OTHERS ---
-    "Aether Paradise": { lat: -630, lng: 403 },
+    "Aether Paradise": { lat: -414, lng: 445 },
     "Team Rocket's Castle": { lat: -414, lng: 445 }
 };
 
@@ -148,7 +148,7 @@ export async function parseEncounterData(textData) {
             const mons = parts[1].trim().split(',');
 
             for (let monStr of mons) {
-                const monMatch = monStr.trim().match(/([a-zA-Z0-9''. ]+)(?:\((\d+)%\))?/);
+                const monMatch = monStr.trim().match(/([a-zA-Z0-9’'. ]+)(?:\((\d+)%\))?/);
                 if (monMatch) {
                     const pokemonName = monMatch[1].trim();
                     const rate = monMatch[2] ? parseInt(monMatch[2]) : 0;
@@ -237,20 +237,4 @@ export async function getPokemonSpawnLocations(pokemonName) {
             pokemonId,
             pokemonName
         }));
-}
-
-// Get all unique Pokemon names that appear in the encounter data
-export async function getAllMapPokemonNames() {
-    const markers = await loadEncounterMarkers();
-    if (!markers || markers.length === 0) return [];
-
-    // Get unique Pokemon names from encounter data
-    const uniqueNames = new Set();
-    markers.forEach(marker => {
-        if (marker.pokemon && marker.pokemon !== 'None') {
-            uniqueNames.add(marker.pokemon);
-        }
-    });
-
-    return Array.from(uniqueNames);
 }
