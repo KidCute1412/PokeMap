@@ -22,7 +22,8 @@ export const getMapState = async (req, res) => {
             lng: pin.longitude,
             notes: pin.notes || '',
             location: pin.location || '',
-            percentage: pin.percentage || 0
+            percentage: pin.percentage || 0,
+            isPinned: pin.isPinned !== undefined ? pin.isPinned : true
         }));
 
         res.status(200).json({
@@ -77,7 +78,8 @@ export const saveMapState = async (req, res) => {
                 notes: marker.notes || '',
                 location: marker.location || '',
                 percentage: marker.percentage || 0,
-                status: false
+                status: false,
+                isPinned: marker.isPinned !== undefined ? marker.isPinned : true
             }));
 
             const insertResult = await MapPin.insertMany(mapPinsToInsert);

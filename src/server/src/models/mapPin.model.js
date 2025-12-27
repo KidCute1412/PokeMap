@@ -37,6 +37,10 @@ const mapPinSchema = new mongoose.Schema({
     status: {
         type: Boolean,
         default: false
+    },
+    isPinned: {
+        type: Boolean,
+        default: true
     }
 }, {
     timestamps: true,

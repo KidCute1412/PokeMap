@@ -84,18 +84,22 @@ function MapController({ onMapReady }) {
 }
 
 // Custom Pokemon marker icon
-function createPokemonIcon(pokemonSprite) {
+function createPokemonIcon(pokemonSprite, isPinned = true) {
     if (!pokemonSprite) return DefaultIcon;
+
+    const opacity = isPinned ? 1 : 0.8;
+    const backgroundColor = isPinned ? 'white' : 'gray';
 
     return L.divIcon({
         className: 'pokemon-marker',
         html: `<div style="
-            background: white;
+            background: ${backgroundColor};
             border-radius: 50%;
             padding: 2px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            opacity: ${opacity};
         ">
-            <img src="${pokemonSprite}" style="width: 32px; height: 32px;" />
+            <img src="${pokemonSprite}" style="width: 32px; height: 32px; opacity: ${opacity};" />
         </div>`,
         iconSize: [36, 36],
         iconAnchor: [18, 18],
@@ -198,7 +202,8 @@ const PokemonMap = forwardRef(function PokemonMap({
                 {/* Render markers */}
                 {markers.map((marker, index) => {
                     const sprite = pokemonSprites[marker.pokemonId];
-                    const markerIcon = sprite ? createPokemonIcon(sprite) : DefaultIcon;
+                    const isPinned = marker.isPinned !== undefined ? marker.isPinned : true;
+                    const markerIcon = sprite ? createPokemonIcon(sprite, isPinned) : DefaultIcon;
 
                     // Debug: log marker positions
                     if (index < 3) {
@@ -213,7 +218,7 @@ const PokemonMap = forwardRef(function PokemonMap({
 
                     return (
                         <Marker
-                            key={marker.id || index}
+                            key={`${marker.id || index}-${isPinned ? 'pinned' : 'unpinned'}`}
                             position={[marker.lat, marker.lng]}
                             icon={markerIcon}
                             eventHandlers={{
