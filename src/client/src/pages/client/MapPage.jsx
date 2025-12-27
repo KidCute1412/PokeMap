@@ -322,9 +322,9 @@ export default function MapPage() {
 
     return (
         isLoadingState ? <Loading></Loading> :
-            <div className="fixed inset-0 top-16 w-full h-[calc(100vh-4rem)] overflow-hidden z-0 flex px-6 py-4 gap-4">
+            <div className="fixed inset-0 top-16 w-full h-[calc(100vh-4rem)] overflow-hidden z-0 flex px-6 py-4 gap-4 rounded-lg">
                 {/* Left Sidebar - Expands to meet map frame */}
-                <div className="flex-1 bg-gray-900/90 backdrop-blur-sm border-r border-gray-700 min-w-0">
+                <div className="flex-1 bg-gray-900/90 backdrop-blur-sm border-r border-gray-700 min-w-0 rounded-lg">
                     {isLoadingState ? (
                         <div className="h-full w-full flex items-center justify-center">
                             <div className="text-white">Loading map state...</div>
@@ -343,13 +343,13 @@ export default function MapPage() {
 
                 {/* Right Side - Square Map Frame with fixed width, sticks to the right */}
                 <div
-                    className="flex-shrink-0 flex flex-col overflow-hidden border-2 border-gray-700 bg-gray-900/50"
+                    className="flex-shrink-0 flex flex-col overflow-hidden border-2 border-gray-700 bg-gray-900/50 rounded-lg"
                     style={{
                         width: squareSize > 0 ? `${squareSize}px` : 'auto'
                     }}
                 >
                     {/* Map Title */}
-                    <div ref={headerRef} className="px-4 py-2 border-b border-gray-700 bg-gray-900/80 flex items-center justify-between flex-shrink-0">
+                    <div ref={headerRef} className="px-4 py-2 border-b border-gray-700 bg-gray-900/80 flex items-center justify-between flex-shrink-0 rounded-t-lg">
                         <h2 className="text-white text-lg font-semibold">
                             Pokemon Ultramoon
                         </h2>

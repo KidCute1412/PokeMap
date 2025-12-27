@@ -26,13 +26,7 @@ export default function CommentsSection({ data }) {
 
             {/* Comment section with socket support */}
             <div className="flex-1 overflow-hidden">
-                {currentUserId ? (
-                    <CommentSection postId={data._id} currentUserId={currentUserId} />
-                ) : (
-                    <div className="p-6 text-gray-400 text-center">
-                        Loading...
-                    </div>
-                )}
+                <CommentSection postId={data._id} currentUserId={currentUserId} />
             </div>
         </div>
     );

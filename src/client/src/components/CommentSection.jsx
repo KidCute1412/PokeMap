@@ -42,7 +42,7 @@ export default function CommentSection({ postId, currentUserId }) {
         socket.on('comment_added', (data) => {
             if (data.success) {
                 const newComment = data.data;
-                
+
                 // Kiểm tra nếu là reply (có parentComment)
                 if (newComment.parentComment) {
                     // Thêm reply vào parent comment
@@ -75,7 +75,7 @@ export default function CommentSection({ postId, currentUserId }) {
                         if (c.replies && c.replies.length > 0) {
                             return {
                                 ...c,
-                                replies: c.replies.map(r => 
+                                replies: c.replies.map(r =>
                                     r._id === updatedComment._id ? updatedComment : r
                                 )
                             };
@@ -194,7 +194,7 @@ export default function CommentSection({ postId, currentUserId }) {
 
             const data = await response.json();
             setUploadingImages(false);
-            
+
             if (data.status === 'success' && data.data) {
                 return data.data;
             } else {
@@ -264,74 +264,72 @@ export default function CommentSection({ postId, currentUserId }) {
         return <div className="comment-loading">Đang tải comments...</div>;
     }
 
-    if (!isConnected) {
-        return <div className="comment-warning">Đang kết nối...</div>;
-    }
-
     return (
         <div className="comment-section">
             <h3>Bình luận ({comments.length})</h3>
 
-            {/* Input form */}
-            <form onSubmit={handleAddComment} className="comment-form">
-                <div className="comment-input-wrapper">
-                    {replyingTo && (
-                        <div className="reply-indicator">
-                            Đang trả lời comment
+            {/* Input form - chỉ hiển thị khi đã sign in và socket connected */}
+            {currentUserId && isConnected && (
+                <form onSubmit={handleAddComment} className="comment-form">
+                    <div className="comment-input-wrapper">
+                        {replyingTo && (
+                            <div className="reply-indicator">
+                                Đang trả lời comment
+                                <button
+                                    type="button"
+                                    className="cancel-reply"
+                                    onClick={() => setReplyingTo(null)}
+                                >
+                                    ✕
+                                </button>
+                            </div>
+                        )}
+                        <textarea
+                            value={newComment}
+                            onChange={(e) => setNewComment(e.target.value)}
+                            placeholder={replyingTo ? "Trả lời bình luận..." : "Viết bình luận..."}
+                            rows="3"
+                        />
+                        <div className="comment-actions-bar">
+                            <label className="image-upload-label">
+                                📷 Ảnh
+                                <input
+                                    type="file"
+                                    multiple
+                                    accept="image/*"
+                                    onChange={handleImageSelect}
+                                    disabled={uploadingImages}
+                                    className="hidden-file-input"
+                                />
+                            </label>
                             <button
-                                type="button"
-                                className="cancel-reply"
-                                onClick={() => setReplyingTo(null)}
+                                type="submit"
+                                disabled={!newComment.trim() || uploadingImages}
                             >
-                                ✕
+                                {uploadingImages ? 'Đang upload...' : 'Gửi'}
                             </button>
                         </div>
-                    )}
-                    <textarea
-                        value={newComment}
-                        onChange={(e) => setNewComment(e.target.value)}
-                        placeholder={replyingTo ? "Trả lời bình luận..." : "Viết bình luận..."}
-                        rows="3"
-                    />
-                    <div className="comment-actions-bar">
-                        <label className="image-upload-label">
-                            📷 Ảnh
-                            <input
-                                type="file"
-                                multiple
-                                accept="image/*"
-                                onChange={handleImageSelect}
-                                disabled={uploadingImages}
-                                className="hidden-file-input"
-                            />
-                        </label>
-                        <button 
-                            type="submit" 
-                            disabled={!newComment.trim() || uploadingImages}
-                        >
-                            {uploadingImages ? 'Đang upload...' : 'Gửi'}
-                        </button>
-                    </div>
 
-                    {/* Image preview */}
-                    {previewImages.length > 0 && (
-                        <div className="image-preview-container">
-                            {previewImages.map((preview, index) => (
-                                <div key={index} className="preview-item">
-                                    <img src={preview} alt={`preview-${index}`} />
-                                    <button
-                                        type="button"
-                                        className="remove-image"
-                                        onClick={() => handleRemoveImage(index)}
-                                    >
-                                        ✕
-                                    </button>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
-            </form>
+                        {/* Image preview */}
+                        {previewImages.length > 0 && (
+                            <div className="image-preview-container">
+                                {previewImages.map((preview, index) => (
+                                    <div key={index} className="preview-item">
+                                        <img src={preview} alt={`preview-${index}`} />
+                                        <button
+                                            type="button"
+                                            className="remove-image"
+                                            onClick={() => handleRemoveImage(index)}
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </form>
+            )}
 
             {/* Comments list */}
             <div className="comments-list">
@@ -418,7 +416,7 @@ export default function CommentSection({ postId, currentUserId }) {
                                                 </div>
                                             )}
                                             <div className="comment-actions">
-                                                <button 
+                                                <button
                                                     className={`action-btn like-btn ${hasUserLiked(reply.likedBy) ? 'liked' : ''}`}
                                                     onClick={() => handleLikeComment(reply._id)}
                                                 >

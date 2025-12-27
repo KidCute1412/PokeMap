@@ -183,7 +183,7 @@ export default function PokemonList({ onPokemonClick, selectedPokemon, selectedP
 
     return (
         isLoading ? <Loading></Loading> :
-        <div className="h-full flex flex-col bg-gray-900/80 border border-gray-700">
+        <div className="h-full flex flex-col bg-gray-900/80 border border-gray-700 rounded-lg">
             {/* Search Bar */}
             <div className="p-4 border-b border-gray-700">
                 <div className="flex items-center bg-gray-800 rounded-full px-4 py-2">
