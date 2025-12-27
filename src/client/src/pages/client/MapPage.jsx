@@ -1,9 +1,19 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import PokemonMap from "@/components/pokemon/PokemonMap.jsx";
 import PokemonList from "@/components/pokemon/PokemonList.jsx";
 import MarkerInfoModal from "@/components/pokemon/MarkerInfoModal.jsx";
 import { getPokemonSpawnLocations } from "@/utils/encounterParser.js";
 import Loading from "@/components/common/ClientLoading.jsx";
+import { Button } from "@/components/ui/button.jsx";
+
+// Island center coordinates (calculated from location data)
+const ISLAND_CENTERS = {
+    melemele: { lat: -340, lng: 360 }, // Top Left
+    akala: { lat: -365, lng: 620 },    // Top Right
+    ulaula: { lat: -640, lng: 820 },   // Bottom Right
+    poni: { lat: -500, lng: 200 },     // Bottom Left
+    aether: { lat: -630, lng: 403 }    // Aether Paradise (Center)
+};
 
 export default function MapPage() {
     const [markers, setMarkers] = useState([]);
@@ -15,6 +25,10 @@ export default function MapPage() {
     const [markerIdCounter, setMarkerIdCounter] = useState(1);
     const [isLoadingSpawns, setIsLoadingSpawns] = useState(false);
     const [isLoadingState, setIsLoadingState] = useState(true);
+    const mapRef = useRef(null);
+    const [squareSize, setSquareSize] = useState(0);
+    const mapContainerRef = useRef(null);
+    const headerRef = useRef(null);
 
     // Load map state from API
     useEffect(() => {
@@ -269,72 +283,174 @@ export default function MapPage() {
         setPendingMarkerPosition(null);
     };
 
+    // Calculate square size for map based on available height minus header
+    useEffect(() => {
+        const calculateSquareSize = () => {
+            // Get header height dynamically
+            const headerHeight = headerRef.current ? headerRef.current.offsetHeight : 50;
+            // Calculate based on viewport height minus navbar
+            const viewportHeight = window.innerHeight - 64; // 64px navbar (top-16)
+            // Map size should be the available height minus header, ensuring it's square
+            const availableHeight = viewportHeight - headerHeight;
+            const size = Math.floor(availableHeight);
+            setSquareSize(size);
+        };
+
+        calculateSquareSize();
+        window.addEventListener('resize', calculateSquareSize);
+        // Use ResizeObserver to watch for header size changes
+        const resizeObserver = new ResizeObserver(() => {
+            calculateSquareSize();
+        });
+        if (headerRef.current) {
+            resizeObserver.observe(headerRef.current);
+        }
+
+        return () => {
+            window.removeEventListener('resize', calculateSquareSize);
+            resizeObserver.disconnect();
+        };
+    }, []);
+
+    // Handle island button click - zoom 2x and center on island
+    const handleIslandClick = (islandKey) => {
+        if (mapRef.current && ISLAND_CENTERS[islandKey]) {
+            const center = ISLAND_CENTERS[islandKey];
+            mapRef.current.zoomToIsland([center.lat, center.lng]);
+        }
+    };
+
     return (
         isLoadingState ? <Loading></Loading> :
-        <div className="min-h-screen pt-20 px-4">
-            {/* Right Side - Map (now full width) */}
-            <div className="w-full h-[calc(100vh-5rem)] rounded-2xl overflow-hidden shadow-2xl border-2 border-gray-700 bg-gray-900/50 relative">
-                {/* Left Sidebar - Embedded inside map */}
-                <div className="absolute left-0 top-0 w-96 h-full z-10 bg-gray-900/90 backdrop-blur-sm border-r border-gray-700">
+            <div className="fixed inset-0 top-16 w-full h-[calc(100vh-4rem)] overflow-hidden z-0 flex px-6 py-4 gap-4">
+                {/* Left Sidebar - Expands to meet map frame */}
+                <div className="flex-1 bg-gray-900/90 backdrop-blur-sm border-r border-gray-700 min-w-0">
                     {isLoadingState ? (
-                        <div className="h-full flex items-center justify-center">
+                        <div className="h-full w-full flex items-center justify-center">
                             <div className="text-white">Loading map state...</div>
                         </div>
                     ) : (
-                        <PokemonList
-                            onPokemonClick={handlePokemonClick}
-                            selectedPokemon={selectedPokemon}
-                            selectedPokemonIds={selectedPokemonIds}
-                            onTogglePokemon={handleTogglePokemon}
-                        />
+                        <div className="h-full w-full">
+                            <PokemonList
+                                onPokemonClick={handlePokemonClick}
+                                selectedPokemon={selectedPokemon}
+                                selectedPokemonIds={selectedPokemonIds}
+                                onTogglePokemon={handleTogglePokemon}
+                            />
+                        </div>
                     )}
                 </div>
 
-                {/* Map Title */}
-                <div className="px-4 py-2 border-b border-gray-700 bg-gray-900/80 ml-96 z-20 relative">
-                    <h2 className="text-white text-lg font-semibold">
-                        Pokemon Ultramoon
-                    </h2>
-                </div>
-
-                {/* Map Container */}
-                <div className="absolute top-10 left-96 right-0 bottom-0">
-                    <PokemonMap
-                        className="w-full h-full rounded-b-2xl"
-                        markers={markers}
-                        onMapClick={handleMapClick}
-                        onMarkerClick={handleMarkerClick}
-                    />
-                </div>
-            </div>
-
-            {/* Marker Info Modal */}
-            {showMarkerModal && (
-                <MarkerInfoModal
-                    marker={selectedMarker || {
-                        lat: pendingMarkerPosition?.lat,
-                        lng: pendingMarkerPosition?.lng
+                {/* Right Side - Square Map Frame with fixed width, sticks to the right */}
+                <div
+                    className="flex-shrink-0 flex flex-col overflow-hidden border-2 border-gray-700 bg-gray-900/50"
+                    style={{
+                        width: squareSize > 0 ? `${squareSize}px` : 'auto'
                     }}
-                    onClose={handleCloseModal}
-                    onSave={handleSaveMarker}
-                    onDelete={selectedMarker?.id ? handleDeleteMarker : null}
-                />
-            )}
+                >
+                    {/* Map Title */}
+                    <div ref={headerRef} className="px-4 py-2 border-b border-gray-700 bg-gray-900/80 flex items-center justify-between flex-shrink-0">
+                        <h2 className="text-white text-lg font-semibold">
+                            Pokemon Ultramoon
+                        </h2>
+                        <div className="flex gap-2">
+                            <Button
+                                variant="default"
+                                size="sm"
+                                onClick={() => handleIslandClick('melemele')}
+                                className="text-white transition-all hover:shadow-[0_4px_12px_rgba(128,125,219,0.5)]"
+                                style={{ backgroundColor: '#807DDB' }}
+                            >
+                                Melemele Island
+                            </Button>
+                            <Button
+                                variant="default"
+                                size="sm"
+                                onClick={() => handleIslandClick('akala')}
+                                className="text-white transition-all hover:shadow-[0_4px_12px_rgba(128,125,219,0.5)]"
+                                style={{ backgroundColor: '#807DDB' }}
+                            >
+                                Akala Island
+                            </Button>
+                            <Button
+                                variant="default"
+                                size="sm"
+                                onClick={() => handleIslandClick('ulaula')}
+                                className="text-white transition-all hover:shadow-[0_4px_12px_rgba(128,125,219,0.5)]"
+                                style={{ backgroundColor: '#807DDB' }}
+                            >
+                                Ula'ula Island
+                            </Button>
+                            <Button
+                                variant="default"
+                                size="sm"
+                                onClick={() => handleIslandClick('poni')}
+                                className="text-white transition-all hover:shadow-[0_4px_12px_rgba(128,125,219,0.5)]"
+                                style={{ backgroundColor: '#807DDB' }}
+                            >
+                                Poni Island
+                            </Button>
+                            <Button
+                                variant="default"
+                                size="sm"
+                                onClick={() => handleIslandClick('aether')}
+                                className="text-white transition-all hover:shadow-[0_4px_12px_rgba(128,125,219,0.5)]"
+                                style={{ backgroundColor: '#807DDB' }}
+                            >
+                                Aether Paradise
+                            </Button>
+                        </div>
+                    </div>
 
-            {/* Loading overlay when fetching spawn data */}
-            {isLoadingSpawns && (
-                <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-lg z-40">
-                    Loading spawn locations for {selectedPokemon?.name}...
+                    {/* Map Container - Square frame to match imageBounds exactly */}
+                    <div className="flex-1 flex items-center justify-center overflow-hidden relative">
+                        {squareSize > 0 && (
+                            <div
+                                style={{
+                                    width: `${squareSize}px`,
+                                    height: `${squareSize}px`,
+                                    flexShrink: 0
+                                }}
+                            >
+                                <PokemonMap
+                                    ref={mapRef}
+                                    className="w-full h-full"
+                                    markers={markers}
+                                    onMapClick={handleMapClick}
+                                    onMarkerClick={handleMarkerClick}
+                                />
+                            </div>
+                        )}
+                    </div>
                 </div>
-            )}
 
-            {/* Info overlay when Pokemon is selected */}
-            {selectedPokemon && !isLoadingSpawns && (
-                <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-40">
-                    Markers placed for {selectedPokemon.name}. Click on map to add more.
-                </div>
-            )}
-        </div>
+                {/* Marker Info Modal */}
+                {showMarkerModal && (
+                    <MarkerInfoModal
+                        marker={selectedMarker || {
+                            lat: pendingMarkerPosition?.lat,
+                            lng: pendingMarkerPosition?.lng
+                        }}
+                        onClose={handleCloseModal}
+                        onSave={handleSaveMarker}
+                        onDelete={selectedMarker?.id ? handleDeleteMarker : null}
+                    />
+                )}
+
+                {/* Loading overlay when fetching spawn data */}
+                {isLoadingSpawns && (
+                    <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-lg z-40">
+                        Loading spawn locations for {selectedPokemon?.name}...
+                    </div>
+                )}
+
+                {/* Info overlay when Pokemon is selected */}
+                {selectedPokemon && !isLoadingSpawns && (
+                    <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-40">
+                        Markers placed for {selectedPokemon.name}. Click on map to add more.
+                    </div>
+                )}
+            </div>
     );
 }
 

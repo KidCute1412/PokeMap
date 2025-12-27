@@ -2,14 +2,25 @@ import { useState, useEffect, useMemo } from 'react';
 import { Search } from 'lucide-react';
 import Loading from '@/components/common/ClientLoading.jsx';
 import PokemonCard from './PokemonCard.jsx';
+import { getAllMapPokemonNames } from '@/utils/encounterParser.js';
 import "animate.css";
+
+// Normalize Pokemon name for comparison
+function normalizePokemonName(name) {
+    return name.toLowerCase()
+        .replace(/['.: ]/g, '-')
+        .replace(/[^a-z0-9-]/g, '')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '');
+}
+
 export default function PokemonList({ onPokemonClick, selectedPokemon, selectedPokemonIds = [], onTogglePokemon }) {
     const [pokemonList, setPokemonList] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     
-    // Fetch Pokemon list from PokeAPI - Alola region
+    // Fetch Pokemon list from PokeAPI - Alola region, then filter by encounter data
     useEffect(() => {
         setIsLoading(true);
         setError(null);
@@ -17,6 +28,11 @@ export default function PokemonList({ onPokemonClick, selectedPokemon, selectedP
         // Fetch Pokemon from Alola region Pokedex
         const fetchPokemon = async () => {
             try {
+                // Get map Pokemon names for filtering
+                const mapPokemonNames = await getAllMapPokemonNames();
+                const mapPokemonNamesSet = new Set(mapPokemonNames.map(name => normalizePokemonName(name)));
+                console.log(`Found ${mapPokemonNames.length} Pokemon in encounter data for filtering`);
+
                 // Try multiple endpoints for Alola Pokedex
                 const pokedexEndpoints = [
                     'https://pokeapi.co/api/v2/pokedex/alola/',
@@ -70,6 +86,12 @@ export default function PokemonList({ onPokemonClick, selectedPokemon, selectedP
                             }
                             const pokemonData = await pokemonResponse.json();
 
+                            // Filter: only include Pokemon that exist in encounter data
+                            const normalizedName = normalizePokemonName(pokemonData.name);
+                            if (!mapPokemonNamesSet.has(normalizedName)) {
+                                return null;
+                            }
+
                             return {
                                 id: pokemonData.id,
                                 name: pokemonData.name.charAt(0).toUpperCase() + pokemonData.name.slice(1),
@@ -96,15 +118,18 @@ export default function PokemonList({ onPokemonClick, selectedPokemon, selectedP
                 // Sort by ID
                 validPokemon.sort((a, b) => a.id - b.id);
 
-                console.log(`Loaded ${validPokemon.length} Alola region Pokemon`);
+                console.log(`Loaded ${validPokemon.length} Alola region Pokemon (filtered by encounter data)`);
                 setPokemonList(validPokemon);
             } catch (err) {
                 console.error('Error fetching Pokemon:', err);
                 setError(`Failed to load Pokemon data: ${err.message}`);
 
-                // Fallback: Load Gen 7 Pokemon (722-809) if Pokedex fails
+                // Fallback: Load Gen 7 Pokemon (722-809) if Pokedex fails, but still filter by encounter data
                 console.log('Attempting fallback: Loading Gen 7 Pokemon...');
                 try {
+                    const mapPokemonNames = await getAllMapPokemonNames();
+                    const mapPokemonNamesSet = new Set(mapPokemonNames.map(name => normalizePokemonName(name)));
+
                     const fallbackPromises = [];
                     for (let i = 722; i <= 809; i++) {
                         fallbackPromises.push(
@@ -116,7 +141,11 @@ export default function PokemonList({ onPokemonClick, selectedPokemon, selectedP
 
                     const fallbackResults = await Promise.all(fallbackPromises);
                     const fallbackPokemon = fallbackResults
-                        .filter(p => p !== null)
+                        .filter(p => {
+                            if (!p) return false;
+                            const normalizedName = normalizePokemonName(p.name);
+                            return mapPokemonNamesSet.has(normalizedName);
+                        })
                         .map(p => ({
                             id: p.id,
                             name: p.name.charAt(0).toUpperCase() + p.name.slice(1),
@@ -126,7 +155,7 @@ export default function PokemonList({ onPokemonClick, selectedPokemon, selectedP
                             sprite: p.sprites.front_default
                         }));
 
-                    console.log(`Fallback loaded ${fallbackPokemon.length} Gen 7 Pokemon`);
+                    console.log(`Fallback loaded ${fallbackPokemon.length} Gen 7 Pokemon (filtered by encounter data)`);
                     setPokemonList(fallbackPokemon);
                     setError(null);
                 } catch (fallbackErr) {
@@ -178,7 +207,7 @@ export default function PokemonList({ onPokemonClick, selectedPokemon, selectedP
                 ) : filteredPokemon.length === 0 ? (
                     <div className="text-center text-gray-400 py-8">No Pokemon found</div>
                 ) : (
-                    <div className="grid grid-cols-3 gap-3">
+                    <div className="grid grid-cols-5 gap-3">
                         {filteredPokemon.map((pokemon) => {
                             const isSelected = selectedPokemonIds.includes(pokemon.id);
                             const isCurrentlySelected = selectedPokemon?.id === pokemon.id;
