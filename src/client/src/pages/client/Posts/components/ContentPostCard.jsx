@@ -135,7 +135,7 @@ export default function ContentPostCard ({data, setData, handleImageClick, isOwn
                     <img
                         src={data.images[0]}
                         alt="Post content"
-                        className="w-full min-h-[400px] max-h-[600px] object-cover rounded-xl cursor-pointer hover:opacity-90 transition-opacity"
+                        className="w-full min-h-[300px] max-h-[300px] object-cover rounded-xl cursor-pointer hover:opacity-90 transition-opacity"
                         onClick={(e) => {
                             e.stopPropagation();
                             handleImageClick(0);

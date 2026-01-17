@@ -75,7 +75,7 @@ export default function ImageDetailModal({ images, currentIndex, onClose }) {
                 )}
 
                 {/* Main image */}
-                <div className="p-4 flex justify-center items-center h-[80%]">
+                <div className="p-4 flex justify-center items-center h-[70%]">
                     <img
                         key={currentImageIndex}
                         src={images[currentImageIndex]}

@@ -5,7 +5,7 @@ import { Archive } from "lucide-react";
 
 const Posts = memo(function Posts({isOwnerProfile = false, posts = [], setPosts, activeTab = "all"}) {
     const [openCreatePostModal, setOpenCreatePostModal] = useState(false);
-
+    
     return(
         <div className="max-w-full px-2 py-2 rounded-2xl">
 

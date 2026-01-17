@@ -8,7 +8,7 @@ const WarnModal = ({ post, setPost, setOpenModal }) => {
   const [comment, setComment] = useState('');
   const {user} = useAuth();
   console.log ("WarnModal User:", user);
-
+  
   
   const reasons = [
     { value: 'inappropriate', label: 'Content is inappropriate' },
@@ -17,7 +17,7 @@ const WarnModal = ({ post, setPost, setOpenModal }) => {
     { value: 'violent', label: 'Violent content' },
     { value: 'other', label: 'Other' }
   ];
-
+  
   const handleSubmit = () => {
     fetch(`${import.meta.env.VITE_API_URL}/api/admin/post/warn/${post._id}`, {
       method: 'PATCH',
